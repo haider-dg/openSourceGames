@@ -53,6 +53,15 @@
   let keys = { left: false, right: false };
   let time = 0;
 
+  // localVars for Ads
+  let lastAdTime = 0;
+  const AD_COOLDOWN = 180000; // 3 minutes
+  const localVars = {
+    vState: "game_restart",
+    vGameID: "doodle_jump_01"
+  };
+  let pendingAdCallback = null;
+
   function setPixelRatio() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const rect = canvas.getBoundingClientRect();
@@ -270,6 +279,39 @@
     animationId = requestAnimationFrame(gameLoop);
   }
 
+  function broadcastAdMessage(state = localVars.vState) {
+    const message = {
+      type: "showInterstitialAd",
+      state: state,
+      timestamp: Date.now(),
+      gameId: localVars.vGameID
+    };
+    window.parent.postMessage(message, "*");
+    console.log(`Sent: ${JSON.stringify(message)}`);
+  }
+
+  function triggerAd(state, callback) {
+    const now = Date.now();
+    if (now - lastAdTime >= AD_COOLDOWN) {
+      pendingAdCallback = callback;
+      broadcastAdMessage(state);
+    } else {
+      callback();
+    }
+  }
+
+  window.addEventListener("message", (event) => {
+    if (event.data.type === "adSuccessfullyWatched") {
+      console.log("Received: Ad Watched");
+      lastAdTime = Date.now();
+      if (pendingAdCallback) {
+        const cb = pendingAdCallback;
+        pendingAdCallback = null;
+        cb();
+      }
+    }
+  });
+
   function startGame() {
     startOverlay.classList.add("hidden");
     gameOverOverlay.classList.add("hidden");
@@ -277,8 +319,12 @@
     gameLoop();
   }
 
-  startBtn.addEventListener("click", startGame);
-  restartBtn.addEventListener("click", startGame);
+  startBtn.addEventListener("click", () => {
+    triggerAd("game_start", startGame);
+  });
+  restartBtn.addEventListener("click", () => {
+    triggerAd("play_again", startGame);
+  });
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") keys.left = true;

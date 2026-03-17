@@ -10,29 +10,66 @@ const finalMessageRevealWord = document.getElementById(
 const figureParts = document.querySelectorAll(".figure-part");
 
 const words = [
-  "application",
-  "programming",
-  "interface",
-  "wizard",
-  "element",
-  "prototype",
-  "callback",
-  "undefined",
-  "arguments",
-  "settings",
-  "selector",
-  "container",
-  "instance",
-  "response",
-  "console",
-  "constructor",
-  "token",
-  "function",
-  "return",
-  "length",
-  "type",
-  "node",
+  "adventure",
+  "building",
+  "calendar",
+  "decoration",
+  "education",
+  "furniture",
+  "garden",
+  "hospital",
+  "island",
+  "journey",
+  "kitchen",
+  "library",
+  "mountain",
+  "notebook",
+  "ocean",
+  "painting",
+  "question",
+  "rainbow",
+  "stadium",
+  "telephone",
+  "umbrella",
+  "vacation",
+  "weather",
+  "yellow",
+  "zebra",
+  "balloon",
+  "chocolate",
+  "diamond",
+  "elephant",
+  "festival",
+  "galaxy",
+  "holiday",
+  "iceberg",
+  "jungle",
+  "kangaroo",
+  "lemonade",
+  "morning",
+  "nightmare",
+  "orchard",
+  "pyramid",
+  "quiet",
+  "river",
+  "sunlight",
+  "treasure",
+  "universe",
+  "village",
+  "whisper",
+  "xylophone",
+  "yesterday",
+  "zodiac",
 ];
+
+// localVars for Ads
+let lastAdTime = 0;
+const AD_COOLDOWN = 180000; // 3 minutes
+const localVars = {
+  vState: "game_restart",
+  vGameID: "hangman_01"
+};
+let pendingAdCallback = null;
 let selectedWord = words[Math.floor(Math.random() * words.length)];
 
 let playable = true;
@@ -111,7 +148,40 @@ window.addEventListener("keypress", (e) => {
   }
 });
 
-playAgainButton.addEventListener("click", () => {
+function broadcastAdMessage(state = localVars.vState) {
+  const message = {
+    type: "showInterstitialAd",
+    state: state,
+    timestamp: Date.now(),
+    gameId: localVars.vGameID
+  };
+  window.parent.postMessage(message, "*");
+  console.log(`Sent: ${JSON.stringify(message)}`);
+}
+
+function triggerAd(state, callback) {
+  const now = Date.now();
+  if (now - lastAdTime >= AD_COOLDOWN) {
+    pendingAdCallback = callback;
+    broadcastAdMessage(state);
+  } else {
+    callback();
+  }
+}
+
+window.addEventListener("message", (event) => {
+  if (event.data.type === "adSuccessfullyWatched") {
+    console.log("Received: Ad Watched");
+    lastAdTime = Date.now();
+    if (pendingAdCallback) {
+      const cb = pendingAdCallback;
+      pendingAdCallback = null;
+      cb();
+    }
+  }
+});
+
+function resetGame() {
   playable = true;
   correctLetters.splice(0);
   wrongLetters.splice(0);
@@ -119,6 +189,10 @@ playAgainButton.addEventListener("click", () => {
   displayWord();
   updateWrongLettersElement();
   popup.style.display = "none";
+}
+
+playAgainButton.addEventListener("click", () => {
+  triggerAd("play_again", resetGame);
 });
 
 // Init
