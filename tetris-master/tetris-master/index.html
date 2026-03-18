@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>HTML5 Tetris</title>
+        <link rel='stylesheet' href='style.css' />
+    </head>
+    <body>
+        <audio id="clearsound" src="sound/pop.ogg" preload="auto"></audio>
+        
+        <div id="game-container">
+            <div id="score-board">Score: <span id="score">0</span></div>
+            <div id="canvas-wrapper">
+                <canvas width='300' height='600'></canvas>
+                <div id="overlay">
+                    <div id="start-screen" class="screen">
+                        <h1>TETRIS</h1>
+                        <button class="btn" onclick="playButtonClicked();">Start Game</button>
+                    </div>
+                    <div id="game-over-screen" class="screen hidden">
+                        <h1>GAME OVER</h1>
+                        <p>Final Score: <span id="final-score">0</span></p>
+                        <button class="btn" onclick="restartGame();">Restart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src='js/tetris.js'></script>
+        <script src='js/controller.js'></script>
+        <script src='js/render.js'></script>
+    </body>
+</html>

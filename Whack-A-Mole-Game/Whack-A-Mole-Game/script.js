@@ -5,6 +5,50 @@ const button = document.querySelector("#start");
 let lastHole;
 let timeUp = false;
 let score = 0;
+let gamesPlayed = 0;
+
+// localVars for Ads
+let lastAdTime = 0;
+const AD_COOLDOWN = 180000; // 3 minutes
+const localVars = {
+  vState: "game_start", 
+  vGameID: "whack_a_mole_01"
+};
+let pendingAdCallback = null;
+
+function broadcastAdMessage(state = localVars.vState) {
+  const message = {
+    type: "showInterstitialAd",
+    state: state,
+    timestamp: Date.now(),
+    gameId: localVars.vGameID
+  };
+  window.parent.postMessage(message, "*");
+  console.log(`Sent: ${JSON.stringify(message)}`);
+}
+
+function triggerAd(state, callback, bypassCooldown = false) {
+  const now = Date.now();
+  const isCooldownActive = (now - lastAdTime < AD_COOLDOWN);
+  if (bypassCooldown || !isCooldownActive) {
+    pendingAdCallback = callback;
+    broadcastAdMessage(state);
+  } else {
+    if (callback) callback();
+  }
+}
+
+window.addEventListener("message", (event) => {
+  if (event.data.type === "adSuccessfullyWatched") {
+    console.log("Received: Ad Watched");
+    lastAdTime = Date.now();
+    if (pendingAdCallback) {
+      const cb = pendingAdCallback;
+      pendingAdCallback = null;
+      cb();
+    }
+  }
+});
 
 function randomTime(min, max) {
   return Math.round(Math.random() * (max - min) + min);
@@ -15,7 +59,6 @@ function randomHole(holes) {
   const hole = holes[idx];
 
   if (hole === lastHole) {
-    console.log("Same one");
     return randomHole(holes);
   }
 
@@ -33,7 +76,7 @@ function peep() {
   }, time);
 }
 
-function startGame() {
+function runGame() {
   scoreBoard.textContent = 0;
   timeUp = false;
   score = 0;
@@ -41,9 +84,19 @@ function startGame() {
   peep();
   setTimeout(() => {
     timeUp = true;
+    gamesPlayed++;
     button.innerHTML = "Try again?";
     button.style.visibility = "visible";
   }, 10000);
+}
+
+function startGame() {
+  // Trigger ad every 3rd round (starting from 3rd round)
+  if (gamesPlayed > 0 && gamesPlayed % 3 === 0) {
+    triggerAd("milestone_3_rounds", runGame, true);
+  } else {
+    runGame();
+  }
 }
 
 function bonk(e) {

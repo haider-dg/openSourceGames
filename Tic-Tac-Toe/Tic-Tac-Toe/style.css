@@ -11,14 +11,18 @@
 body {
   width: 100vw;
   height: 100vh;
-  background-color: lightslategray;
+  background-color: lightslategray; /* fallback color */
+  background-image: url("bg.png"); /* your image path */
+  background-size: cover;        /* make image cover full screen */
+  background-position: top;   /* center the image */
+  background-repeat: no-repeat;  /* prevent repeating */
+
   color: white;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
 }
-
 h1 {
   color: white;
   font-size: 32px;

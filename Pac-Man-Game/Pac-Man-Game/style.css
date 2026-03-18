@@ -7,15 +7,22 @@
 }
 
 body {
-  min-height: 100vh;
+  /* width: 100vw; */
+  height: 100vh;
+  background:
+    linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+    url("bg.png");
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+
+  color: white;
   display: flex;
-  align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at top, #06142e 0%, #01010a 55%, #000 100%);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  color: #f8f8ff;
+  align-items: center;
+  flex-direction: column;
 }
+
 
 .wrapper {
   width: 100%;
@@ -109,4 +116,64 @@ canvas {
     height: auto;
   }
 }
-
+.level-label {
+  color: #2ecc71;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.hidden {
+  display: none !important;
+}
+.game-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.next-level-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100% !important;
+  background: rgba(0, 0, 0, 0.82);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  border-radius: 8px;
+}
+.modal {
+  background: #1a1a3a;
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  border: 2px solid #6563ff;
+  box-shadow: 0 0 20px rgba(101, 99, 255, 0.4);
+}
+.modal h2 {
+  color: #ffd966;
+  margin-bottom: 10px;
+}
+.modal p {
+  color: #fff;
+  margin-bottom: 20px;
+}
+.modal button {
+  background: #6563ff;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.modal button:hover {
+  background: #4e4cf1;
+  transform: scale(1.05);
+}

@@ -26,6 +26,48 @@
     cells: [],
   };
 
+  // localVars for Ads
+  let lastAdTime = 0;
+  const AD_COOLDOWN = 180000; // 3 minutes
+  const localVars = {
+    vState: "game_start", 
+    vGameID: "sudoku_game_01"
+  };
+  let pendingAdCallback = null;
+
+  function broadcastAdMessage(state = localVars.vState) {
+    const message = {
+      type: "showInterstitialAd",
+      state: state,
+      timestamp: Date.now(),
+      gameId: localVars.vGameID
+    };
+    window.parent.postMessage(message, "*");
+    console.log(`Sent: ${JSON.stringify(message)}`);
+  }
+
+  function triggerAd(state, callback) {
+    const now = Date.now();
+    if (now - lastAdTime >= AD_COOLDOWN) {
+      pendingAdCallback = callback;
+      broadcastAdMessage(state);
+    } else {
+      if (callback) callback();
+    }
+  }
+
+  window.addEventListener("message", (event) => {
+    if (event.data.type === "adSuccessfullyWatched") {
+      console.log("Received: Ad Watched");
+      lastAdTime = Date.now();
+      if (pendingAdCallback) {
+        const cb = pendingAdCallback;
+        pendingAdCallback = null;
+        cb();
+      }
+    }
+  });
+
   const levelScreen = document.getElementById("levelScreen");
   const gameScreen = document.getElementById("gameScreen");
   const boardEl = document.getElementById("board");
@@ -317,13 +359,17 @@
   document.querySelectorAll(".level-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const level = btn.dataset.level;
-      startGame(level);
-      showGame();
+      triggerAd("level_select", () => {
+        startGame(level);
+        showGame();
+      });
     });
   });
 
   document.getElementById("newGameBtn").addEventListener("click", () => {
-    startGame(state.level);
+    triggerAd("new_game", () => {
+      startGame(state.level);
+    });
   });
 
   document.getElementById("changeLevelBtn").addEventListener("click", () => {
@@ -333,7 +379,9 @@
 
   document.getElementById("playAgainBtn").addEventListener("click", () => {
     winOverlay.classList.add("hidden");
-    startGame(state.level);
+    triggerAd("play_again", () => {
+      startGame(state.level);
+    });
   });
 
   numberPadEl.addEventListener("click", (e) => {

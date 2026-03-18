@@ -18,6 +18,10 @@
  </head> 
  <body> 
   <div class="wrapper"> 
+   <div class="game-info">
+    <div class="score">Score: <span id="score">0</span></div>
+    <div class="level">Level: <span id="level">1</span></div>
+   </div>
    <ul class="cards"> 
     <li class="card"> 
      <div class="view front-view"> 
@@ -132,6 +136,13 @@
       <img src="images/img-4.png" alt="card-img"> 
      </div> </li> 
    </ul> 
+   <div id="restartOverlay" class="restart-overlay hidden">
+    <div class="modal">
+      <h2>Success!</h2>
+      <p>All cards matched.</p>
+      <button id="restartBtn">Play Again</button>
+    </div>
+   </div>
   </div> 
   <script src="script.js"></script> 
  
