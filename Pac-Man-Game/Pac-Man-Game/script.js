@@ -263,6 +263,7 @@ function resetEntities() {
   pacman.dirY = 0;
   pacman.nextDirX = 0;
   pacman.nextDirY = 0;
+  lastTime = 0; // Reset timing to prevent massive delta after pause/reset
 
   ghosts = [];
   const ghostCount = 2 + currentLevel;
@@ -508,9 +509,21 @@ function draw() {
 }
 
 function loop(timestamp) {
-  if (!lastTime) lastTime = timestamp;
+  if (!lastTime) {
+    lastTime = timestamp;
+    requestAnimationFrame(loop);
+    return;
+  }
+  
   const delta = (timestamp - lastTime) / 1000;
   lastTime = timestamp;
+
+  // If delta is too large (e.g., after a tab switch or ad), skip this frame
+  if (delta > 0.1) {
+    requestAnimationFrame(loop);
+    return;
+  }
+
   gameTime = timestamp / 1000;
   if (!gameOver) {
     movePacman(delta);

@@ -12,6 +12,15 @@ let totalChances = 10;
 let guessesThisGame = 0;
 let gameEnded = false;
 
+// Sounds
+const winSound = new Audio("level-complete.mp3");
+const lossSound = new Audio("fail.mp3");
+
+function playSound(audio) {
+    audio.currentTime = 0;
+    audio.play().catch(e => console.log("Sound play prevented:", e));
+}
+
 // Statistics
 let won = parseInt(localStorage.getItem("guessing_won") || "0");
 let lost = parseInt(localStorage.getItem("guessing_lost") || "0");
@@ -79,9 +88,11 @@ const handleGameOver = (isWin) => {
     if (isWin) {
         won++;
         localStorage.setItem("guessing_won", won);
+        playSound(winSound);
     } else {
         lost++;
         localStorage.setItem("guessing_lost", lost);
+        playSound(lossSound);
     }
     updateStatsUI();
 };

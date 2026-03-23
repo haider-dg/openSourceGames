@@ -21,9 +21,17 @@
 }
 
 body {
-  font-family: "Outfit", sans-serif;
-  background: var(--bg-page);
-  color: var(--text);
+  /* font-family: "Outfit", sans-serif; */
+  /* background: var(--bg-page); */
+  width: 100vw;
+  height: 100vh;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    url("bg.png");
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+  color: white;
   min-height: 100vh;
   display: flex;
   align-items: center;

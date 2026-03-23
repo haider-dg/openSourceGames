@@ -19,6 +19,15 @@ let setIntervalId;
 let score = 0;
 let consecutiveLosses = 0;
 
+// Sounds
+const eatSound = new Audio("click_sound.mp3");
+const hitSound = new Audio("hit-sound.mp3");
+
+function playSound(audio) {
+    audio.currentTime = 0;
+    audio.play().catch(e => console.log("Sound play prevented:", e));
+}
+
 // localVars for Ads
 let lastAdTime = 0;
 const AD_COOLDOWN = 180000; // 3 minutes
@@ -184,6 +193,7 @@ const initGame = () => {
         updateFoodPosition();
         snakeBody.push([foodY, foodX]); // Pushing food position to snake body array
         score++; // increment score by 1
+        playSound(eatSound);
         highScore = score >= highScore ? score : highScore;
         localStorage.setItem("snake-high-score", highScore);
         scoreElement.innerText = `Score: ${score}`;
@@ -201,6 +211,7 @@ const initGame = () => {
 
     // Checking if the snake's head is out of wall, if so setting gameOver to true
     if(snakeX <= 0 || snakeX > 30 || snakeY <= 0 || snakeY > 30) {
+        playSound(hitSound);
         return gameOver = true;
     }
 
@@ -213,6 +224,7 @@ const initGame = () => {
         // This prevents immediate death upon revive when the body is stacked.
         if (i !== 0 && snakeBody[0][1] === snakeBody[i][1] && snakeBody[0][0] === snakeBody[i][0]) {
             if (velocityX !== 0 || velocityY !== 0) {
+                if (!gameOver) playSound(hitSound);
                 gameOver = true;
             }
         }

@@ -14,27 +14,41 @@
   box-sizing: border-box;
 }
 
-html, body {
+/* html, body {
   height: 100%;
   margin: 0;
   overflow: hidden;
-}
+} */
 
 body {
+  /* width: 100vw; */
+  height: 100%;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    url("bg.png");
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+/* body {
   background-color: var(--background-color);
-  background: linear-gradient(
-    to right,
-    var(--background-color),
-    var(--button-color),
-    var(--background-secondary-color)
-  );
+  background: linear-gradient(to right,
+      var(--background-color),
+      var(--button-color),
+      var(--background-secondary-color));
   font-family: "Balsamiq Sans", cursive;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
-}
+} */
 
 h1 {
   font-size: clamp(1.5rem, 5vw, 2.75rem);
@@ -51,7 +65,8 @@ canvas {
   /* width: 100%; */
   height: auto;
   max-width: 800px;
-  max-height: 70vh; /* Prevent canvas from pushing content off screen */
+  max-height: 70vh;
+  /* Prevent canvas from pushing content off screen */
   object-fit: contain;
 }
 
@@ -115,7 +130,9 @@ canvas {
   overflow: hidden;
 }
 
-.restart-btn, .next-level-btn, .revive-btn {
+.restart-btn,
+.next-level-btn,
+.revive-btn {
   display: none;
   position: absolute;
   top: 0;
@@ -125,7 +142,8 @@ canvas {
   margin: auto;
   width: fit-content;
   height: fit-content;
-  z-index: 100; /* Higher z-index to be above everything */
+  z-index: 100;
+  /* Higher z-index to be above everything */
   font-size: 1.5rem;
   padding: 1rem 2rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
@@ -141,7 +159,8 @@ canvas {
 
 .revive-btn {
   background-color: #f39c12;
-  margin-top: calc(auto - 60px); /* This won't work with auto, using transform or different margin */
+  margin-top: calc(auto - 60px);
+  /* This won't work with auto, using transform or different margin */
 }
 
 /* Adjusting to stack buttons vertically in the center */

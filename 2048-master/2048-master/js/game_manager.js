@@ -10,14 +10,43 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
 
+  // Ad Helpers
+  this.lastAdTime = 0;
+  this.vGameID = "2048_master_01";
+  this.pendingAdCallback = null;
+
+  window.addEventListener("message", function (event) {
+    if (event.data.type === "adSuccessfullyWatched") {
+      this.lastAdTime = Date.now();
+      if (this.pendingAdCallback) {
+        var cb = this.pendingAdCallback;
+        this.pendingAdCallback = null;
+        cb();
+      }
+    }
+  }.bind(this));
+
   this.setup();
 }
 
+GameManager.prototype.triggerAd = function (state, callback) {
+  this.pendingAdCallback = callback;
+  var message = {
+    type: "showInterstitialAd",
+    state: state,
+    timestamp: Date.now(),
+    gameId: this.vGameID
+  };
+  window.parent.postMessage(message, "*");
+};
+
 // Restart the game
 GameManager.prototype.restart = function () {
-  this.storageManager.clearGameState();
-  this.actuator.continueGame(); // Clear the game won/lost message
-  this.setup();
+  this.triggerAd("restart", function() {
+    this.storageManager.clearGameState();
+    this.actuator.continueGame(); // Clear the game won/lost message
+    this.setup();
+  }.bind(this));
 };
 
 // Keep playing after winning (allows going over 2048)

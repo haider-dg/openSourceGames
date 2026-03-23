@@ -40,6 +40,14 @@ function candyCrushGame() {
         "url(https://raw.githubusercontent.com/arpit456jain/Amazing-Js-Projects/master/Candy%20Crush/utils/purple-candy.png)",
     ];
 
+    // Sound Effects
+    const matchSound = new Audio("crush_sound.mp3");
+
+    function playMatchSound() {
+        matchSound.currentTime = 0;
+        matchSound.play().catch(e => console.log("Sound play prevented:", e));
+    }
+
     // Create the Game Board
     function createBoard() {
         grid.innerHTML = ""; // Clear existing grid
@@ -127,6 +135,7 @@ function candyCrushGame() {
             if (decidedColor && rowOfFour.every(index => squares[index].style.backgroundImage === decidedColor && !isBlank)) {
                 score += 4;
                 scoreDisplay.innerHTML = score;
+                playMatchSound();
                 rowOfFour.forEach(index => squares[index].style.backgroundImage = "");
             }
         }
@@ -140,6 +149,7 @@ function candyCrushGame() {
             if (decidedColor && columnOfFour.every(index => squares[index].style.backgroundImage === decidedColor && !isBlank)) {
                 score += 4;
                 scoreDisplay.innerHTML = score;
+                playMatchSound();
                 columnOfFour.forEach(index => squares[index].style.backgroundImage = "");
             }
         }
@@ -154,6 +164,7 @@ function candyCrushGame() {
             if (decidedColor && rowOfThree.every(index => squares[index].style.backgroundImage === decidedColor && !isBlank)) {
                 score += 3;
                 scoreDisplay.innerHTML = score;
+                playMatchSound();
                 rowOfThree.forEach(index => squares[index].style.backgroundImage = "");
             }
         }
@@ -167,6 +178,7 @@ function candyCrushGame() {
             if (decidedColor && columnOfThree.every(index => squares[index].style.backgroundImage === decidedColor && !isBlank)) {
                 score += 3;
                 scoreDisplay.innerHTML = score;
+                playMatchSound();
                 columnOfThree.forEach(index => squares[index].style.backgroundImage = "");
             }
         }
@@ -227,7 +239,6 @@ function candyCrushGame() {
             }, 300000); 
         }
     }
-// 300000
     function updateTimerDisplay() {
         if (currentMode === "timed") {
             let minutes = Math.floor(timeLeft / 60);

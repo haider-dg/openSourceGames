@@ -10,6 +10,14 @@ let level = 1;
 let cardOne, cardTwo;
 let disableDeck = false;
 
+// Sounds
+const winSound = new Audio("level-complete.mp3");
+
+function playSound(audio) {
+    audio.currentTime = 0;
+    audio.play().catch(e => console.log("Sound play prevented:", e));
+}
+
 // localVars for Ads
 let lastAdTime = 0;
 const AD_COOLDOWN = 180000; // 3 minutes
@@ -72,6 +80,7 @@ function matchCards(img1, img2) {
         score += 50;
         scoreTag.innerText = score;
         if(matched == 8) {
+            playSound(winSound);
             setTimeout(() => {
                 restartOverlay.classList.remove("hidden");
             }, 500);
