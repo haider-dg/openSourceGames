@@ -53,6 +53,14 @@
   let keys = { left: false, right: false };
   let time = 0;
 
+  // Sounds
+  const lostSound = new Audio("lost.mp3");
+
+  function playSound(audio) {
+    audio.currentTime = 0;
+    audio.play().catch(e => console.log("Sound play prevented:", e));
+  }
+
   // localVars for Ads
   let lastAdTime = 0;
   const AD_COOLDOWN = 180000; // 3 minutes
@@ -202,6 +210,7 @@
 
   function gameOver() {
     gameRunning = false;
+    playSound(lostSound);
     if (animationId) cancelAnimationFrame(animationId);
     finalScoreEl.textContent = score;
     gameOverOverlay.classList.remove("hidden");
