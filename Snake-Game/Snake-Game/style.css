@@ -57,16 +57,14 @@ body {
 
 .controls {
   display: none;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
 }
 .controls i {
-  padding: 25px 0;
   text-align: center;
   font-size: 1.3rem;
   color: #B8C6DC;
-  width: calc(100% / 4);
   cursor: pointer;
-  border-right: 1px solid #171B26;
 }
 
 .hidden {
@@ -141,10 +139,35 @@ body {
     padding: 15px 27px;
   }
   .controls {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 15px;
+    padding: 20px;
+    width: fit-content;
+    margin: 0 auto;
   }
   .controls i {
-    padding: 15px 0;
-    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 65px;
+    height: 65px;
+    font-size: 1.8rem;
+    background: #171B26;
+    border-radius: 12px;
+    border: 1px solid #34495e;
+    box-shadow: 0 5px 0 #0d1117;
+    transition: all 0.1s;
+    color: #B8C6DC;
   }
+  .controls i:active {
+    background: #2c3e50;
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #0d1117;
+  }
+  .controls i[data-key="ArrowUp"] { grid-column: 2; grid-row: 1; }
+  .controls i[data-key="ArrowLeft"] { grid-column: 1; grid-row: 2; }
+  .controls i[data-key="ArrowDown"] { grid-column: 2; grid-row: 2; }
+  .controls i[data-key="ArrowRight"] { grid-column: 3; grid-row: 2; }
 }

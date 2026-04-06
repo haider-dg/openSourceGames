@@ -390,9 +390,38 @@ function update() {
   requestAnimationFrame(update);
 }
 
+// Touch Controls
+function handleTouch(e) {
+  const touch = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const touchX = (touch.clientX - rect.left) * scaleX;
+  
+  paddle.x = touchX - paddle.w / 2;
+  
+  // Keep paddle within bounds
+  if (paddle.x < 0) paddle.x = 0;
+  if (paddle.x + paddle.w > canvas.width) paddle.x = canvas.width - paddle.w;
+  
+  // Release ball if it's on the paddle
+  if (isBallOnPaddle) {
+    isBallOnPaddle = false;
+  }
+}
+
 // Event Listeners
 document.addEventListener("keydown", keyDown);
 document.addEventListener("keyup", keyUp);
+
+canvas.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  handleTouch(e);
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+  handleTouch(e);
+}, { passive: false });
 rulesButton.addEventListener("click", () => rules.classList.add("show"));
 closeButton.addEventListener("click", () => rules.classList.remove("show"));
 

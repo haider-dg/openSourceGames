@@ -61,13 +61,20 @@ function candyCrushGame() {
             grid.appendChild(square);
             squares.push(square);
         }
-        // Add drag event listeners
-        squares.forEach(square => square.addEventListener("dragstart", dragStart));
-        squares.forEach(square => square.addEventListener("dragend", dragEnd));
-        squares.forEach(square => square.addEventListener("dragover", dragOver));
-        squares.forEach(square => square.addEventListener("dragenter", dragEnter));
-        squares.forEach(square => square.addEventListener("dragleave", dragLeave));
-        squares.forEach(square => square.addEventListener("drop", dragDrop));
+        // Add drag and touch event listeners
+        squares.forEach(square => {
+            square.addEventListener("dragstart", dragStart);
+            square.addEventListener("dragend", dragEnd);
+            square.addEventListener("dragover", dragOver);
+            square.addEventListener("dragenter", dragEnter);
+            square.addEventListener("dragleave", dragLeave);
+            square.addEventListener("drop", dragDrop);
+            
+            // Touch listeners for mobile
+            square.addEventListener("touchstart", touchStart, { passive: false });
+            square.addEventListener("touchend", touchEnd, { passive: false });
+            square.addEventListener("touchmove", touchMove, { passive: false });
+        });
         
         // Re-append restart overlay after board creation to keep it on top
         grid.appendChild(restartOverlay);
@@ -105,6 +112,40 @@ function candyCrushGame() {
             squares[squareIdBeingReplaced].style.backgroundImage = colorBeingReplaced;
             squares[squareIdBeingDragged].style.backgroundImage = colorBeingDragged;
         } else {
+            squares[squareIdBeingDragged].style.backgroundImage = colorBeingDragged;
+        }
+    }
+
+    // Mobile Touch Handlers
+    function touchStart(e) {
+        colorBeingDragged = this.style.backgroundImage;
+        squareIdBeingDragged = parseInt(this.id);
+        // Optional: add a visual hint that it's picked up
+        this.style.opacity = "0.7";
+    }
+
+    function touchMove(e) {
+        // Prevent scrolling while dragging candy
+        e.preventDefault();
+    }
+
+    function touchEnd(e) {
+        this.style.opacity = "1";
+        const touch = e.changedTouches[0];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        
+        if (target && target.parentElement === grid && target.hasAttribute("id")) {
+            colorBeingReplaced = target.style.backgroundImage;
+            squareIdBeingReplaced = parseInt(target.id);
+
+            // Same drag-and-drop logic applied manually
+            if (squareIdBeingDragged !== squareIdBeingReplaced) {
+                target.style.backgroundImage = colorBeingDragged;
+                squares[squareIdBeingDragged].style.backgroundImage = colorBeingReplaced;
+                dragEnd();
+            }
+        } else {
+            // Reset if released outside or on same square
             squares[squareIdBeingDragged].style.backgroundImage = colorBeingDragged;
         }
     }
