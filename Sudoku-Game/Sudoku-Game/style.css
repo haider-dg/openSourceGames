@@ -5,15 +5,20 @@
 }
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: "Outfit", sans-serif;
-  background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  color: #e8e8e8;
+  /* width: 100vw; */
+  height: 100vh;
+  background:
+    linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+    url("bg.png");
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+
+  color: white;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 1rem;
+  align-items: center;
+  flex-direction: column;
 }
 
 .wrapper {

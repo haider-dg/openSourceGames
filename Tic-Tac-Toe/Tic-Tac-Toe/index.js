@@ -23,12 +23,64 @@ let currentPlayer=x;
 // Text of X or O to place in the status.
 let player="X";
 let running=false;
+let gamesPlayed = 0;
+
+// localVars for Ads
+let lastAdTime = 0;
+const AD_COOLDOWN = 180000; // 3 minutes
+const localVars = {
+    vState: "game_end",
+    vGameID: "tic_tac_toe_01"
+};
+let pendingAdCallback = null;
+
+function broadcastAdMessage(state = localVars.vState) {
+    const message = {
+        type: "showInterstitialAd",
+        state: state,
+        timestamp: Date.now(),
+        gameId: localVars.vGameID
+    };
+    window.parent.postMessage(message, "*");
+    console.log(`Sent: ${JSON.stringify(message)}`);
+}
+
+function triggerAd(state, callback, bypassCooldown = false) {
+    const now = Date.now();
+    const isCooldownActive = (now - lastAdTime < AD_COOLDOWN);
+    if (bypassCooldown || !isCooldownActive) {
+        pendingAdCallback = callback;
+        broadcastAdMessage(state);
+    } else {
+        if (callback) callback();
+    }
+}
+
+window.addEventListener("message", (event) => {
+    if (event.data.type === "adSuccessfullyWatched") {
+        console.log("Received: Ad Watched");
+        lastAdTime = Date.now();
+        if (pendingAdCallback) {
+            const cb = pendingAdCallback;
+            pendingAdCallback = null;
+            cb();
+        }
+    }
+});
+
 init();
 
 // Initially it adds click event to every box. as if we click on any of the box then it calls the boxClick function.
 function init(){
   boxEls.forEach(box=>box.addEventListener('click',boxClick));
-  restartBtnEl.addEventListener('click',restartGame);
+  restartBtnEl.addEventListener('click', () => {
+      // Trigger ad every 3 games
+      if (gamesPlayed > 0 && gamesPlayed % 3 === 0) {
+          triggerAd("milestone_3_rounds", restartGame, true);
+      } else {
+          restartGame();
+      }
+  });
   statusEl.textContent=`Now "${player}" Turn`;
   running=true;
 }
@@ -100,12 +152,14 @@ function checkWinner(){
 
     // if win then this will execute. 
   if(isWon){
+    gamesPlayed++;
     statusEl.textContent=`Hurrah...! "${player}" Won the game🕺`;
     statusEl.style.color = "green"
     restartBtnEl.textContent = "Play Again 😉"
     running=false;
     // if the game is draw then this executes.
   }else if(!options.includes("")){
+    gamesPlayed++;
     statusEl.textContent=`Oops..! Game Draw..!`;
     statusEl.style.color = "red"
     restartBtnEl.textContent = "Play Again 😉"

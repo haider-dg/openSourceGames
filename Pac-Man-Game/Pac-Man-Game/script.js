@@ -1,10 +1,10 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-const tileSize = 16; // 28 * 16 = 448, 31 * 16 = 496
-const corridorScale = 1.25; // corridor (where Pac-Man moves) is 1.25x wider
-const corridorTile = Math.round(tileSize * corridorScale); // 20
-const wallSize = tileSize; // walls stay 16px
+const tileSize = 16;
+const corridorScale = 1.25;
+const corridorTile = Math.round(tileSize * corridorScale);
+const wallSize = tileSize;
 const cols = 28;
 const rows = 31;
 
@@ -13,70 +13,159 @@ canvas.height = rows * corridorTile;
 
 const scoreEl = document.getElementById("score");
 const livesEl = document.getElementById("lives");
+const levelEl = document.getElementById("level");
 const restartBtn = document.getElementById("restartBtn");
+const nextLevelOverlay = document.getElementById("nextLevelOverlay");
+const nextLevelBtn = document.getElementById("nextLevelBtn");
 
 // 0: empty, 1: wall, 2: pellet, 3: power pellet
-// Simple Pac-Man inspired layout (not 100% original map)
-const levelLayout = [
-  "1111111111111111111111111111",
-  "1222222222112222222222222221",
-  "1211112112112112112111112121",
-  "1311112112112112112111112131",
-  "1222222222222222222222222221",
-  "1211112111112111112111112121",
-  "1222222112222222211222222221",
-  "1111112112111112112111111111",
-  "0000012112110002112110000000",
-  "1111112112111112112111111111",
-  "1222222222222112222222222221",
-  "1211112111112111112111112121",
-  "1222212222222222222222122221",
-  "1111212111110001111122111111",
-  "0000212110000000000122110000",
-  "1111212110111111101122111111",
-  "1222222220222222202222222221",
-  "1211112112111112112111112121",
-  "1222222112222222211222222221",
-  "1111112112111112112111111111",
-  "0000012112110002112110000000",
-  "1111112112111112112111111111",
-  "1222222222222222222222222221",
-  "1211112111112111112111112121",
-  "1311112222222112222222112131",
-  "1222222111112111111122222221",
-  "1111112112222222212111111111",
-  "1222222222112222112222222221",
-  "1211111112112112111111112121",
-  "1222222222222222222222222221",
-  "1111111111111111111111111111",
+const levelLayouts = [
+  [
+    "1111111111111111111111111111",
+    "1222222222112222222222222221",
+    "1211112112112112112111112121",
+    "1311112112112112112111112131",
+    "1222222222222222222222222221",
+    "1211112111112111112111112121",
+    "1222222112222222211222222221",
+    "1111112112111112112111111111",
+    "0000012112110002112110000000",
+    "1111112112111112112111111111",
+    "1222222222222112222222222221",
+    "1211112111112111112111112121",
+    "1222212222222222222222122221",
+    "1111212111110001111122111111",
+    "0000212110000000000122110000",
+    "1111212110111111101122111111",
+    "1222222220222222202222222221",
+    "1211112112111112112111112121",
+    "1222222112222222211222222221",
+    "1111112112111112112111111111",
+    "0000012112110002112110000000",
+    "1111112112111112112111111111",
+    "1222222222222222222222222221",
+    "1211112111112111112111112121",
+    "1311112222222112222222112131",
+    "1222222111112111111122222221",
+    "1111112112222222212111111111",
+    "1222222222112222112222222221",
+    "1211111112112112111111112121",
+    "1222222222222222222222222221",
+    "1111111111111111111111111111",
+  ],
+  [
+    "1111111111111111111111111111",
+    "1222222222112222112222222221",
+    "1211112112112112112112111121",
+    "1322222222222222222222222231",
+    "1211112111112111112111112121",
+    "1222222112222222211222222221",
+    "1111112112111112112111111111",
+    "0000012112110002112110000000",
+    "1111112112111112112111111111",
+    "1222222222222112222222222221",
+    "1211112111112111112111112121",
+    "1222212222222222222222122221",
+    "1111212111110001111122111111",
+    "0000212110000000000122110000",
+    "1111212110111111101122111111",
+    "1222222220222222202222222221",
+    "1211112112111112112111112121",
+    "1222222112222222211222222221",
+    "1111112112111112112111111111",
+    "0000012112110002112110000000",
+    "1111112112111112112111111111",
+    "1222222222222222222222222221",
+    "1211112111112111112111112121",
+    "1311112222222112222222112131",
+    "1222222111112111111122222221",
+    "1111112112222222212111111111",
+    "1222222222112222112222222221",
+    "1211111112112112111111112121",
+    "1222222222222222222222222221",
+    "1222222222222222222222222221",
+    "1111111111111111111111111111",
+  ],
 ];
 
 let map = [];
 let pelletsRemaining = 0;
+let currentLevel = 0;
+
+// localVars for Ads
+let lastAdTime = 0;
+const AD_COOLDOWN = 180000; // 3 minutes
+const localVars = {
+  vState: "game_load",
+  vGameID: "pac_man_01"
+};
+let pendingAdCallback = null;
+
+function broadcastAdMessage(state = localVars.vState) {
+  const message = {
+    type: "showInterstitialAd",
+    state: state,
+    timestamp: Date.now(),
+    gameId: localVars.vGameID
+  };
+  window.parent.postMessage(message, "*");
+  console.log(`Sent: ${JSON.stringify(message)}`);
+}
+
+function triggerAd(state, callback) {
+  const now = Date.now();
+  if (now - lastAdTime >= AD_COOLDOWN) {
+    pendingAdCallback = callback;
+    broadcastAdMessage(state);
+  } else {
+    if (callback) callback();
+  }
+}
+
+window.addEventListener("message", (event) => {
+  if (event.data.type === "adSuccessfullyWatched") {
+    console.log("Received: Ad Watched");
+    lastAdTime = Date.now();
+    if (pendingAdCallback) {
+      const cb = pendingAdCallback;
+      pendingAdCallback = null;
+      cb();
+    }
+  }
+});
 
 const pacman = {
-  x: 1, // start bottom-left
+  x: 1,
   y: 29,
   dirX: 0,
   dirY: 0,
   nextDirX: 0,
   nextDirY: 0,
-  speed: 8, // tiles per second
+  speed: 8,
   radius: tileSize * 0.6,
 };
 
-const ghosts = [
-  { x: 13, y: 14, dirX: 1, dirY: 0, color: "#ff4b4b" },
-  { x: 14, y: 14, dirX: -1, dirY: 0, color: "#4bc6ff" },
-];
+let ghosts = [];
+
+const ghostColors = ["#ff4b4b", "#4bc6ff", "#ffb8de", "#ffb847", "#00ffde", "#ff4500"];
+
+function createGhost(id) {
+  // Start in ghost house area (center) - keep them in row 14 where it's empty
+  return {
+    x: 13 + (id % 3), // Spread them out horizontally a bit
+    y: 14,
+    dirX: id % 2 === 0 ? 1 : -1,
+    dirY: 0,
+    color: ghostColors[id % ghostColors.length]
+  };
+}
 
 let score = 0;
 let lives = 3;
 let gameOver = false;
 let lastTime = 0;
-let gameTime = 0; // for mouth animation
+let gameTime = 0;
 
-// --- Sound (Web Audio API, no external files) ---
 let audioCtx = null;
 let backgroundOsc = null;
 let backgroundGain = null;
@@ -106,7 +195,6 @@ function startBackgroundSound() {
     backgroundGain.gain.setValueAtTime(0.04, ctx.currentTime);
     backgroundOsc.start(ctx.currentTime);
     backgroundStarted = true;
-    // Siren: slowly rise and fall like original Pac-Man
     backgroundInterval = setInterval(() => {
       if (!backgroundOsc || !ctx) return;
       const t = Date.now() / 1000;
@@ -156,10 +244,11 @@ function playDeathSound() {
 function initMap() {
   map = [];
   pelletsRemaining = 0;
+  const layout = levelLayouts[currentLevel % levelLayouts.length];
   for (let r = 0; r < rows; r++) {
     const row = [];
     for (let c = 0; c < cols; c++) {
-      let val = Number(levelLayout[r][c]);
+      let val = Number(layout[r][c]);
       if (val === 2 || val === 3) pelletsRemaining++;
       row.push(val);
     }
@@ -174,32 +263,30 @@ function resetEntities() {
   pacman.dirY = 0;
   pacman.nextDirX = 0;
   pacman.nextDirY = 0;
+  lastTime = 0; // Reset timing to prevent massive delta after pause/reset
 
-  ghosts[0].x = 13;
-  ghosts[0].y = 14;
-  ghosts[0].dirX = 1;
-  ghosts[0].dirY = 0;
-
-  ghosts[1].x = 14;
-  ghosts[1].y = 14;
-  ghosts[1].dirX = -1;
-  ghosts[1].dirY = 0;
+  ghosts = [];
+  const ghostCount = 2 + currentLevel;
+  for (let i = 0; i < ghostCount; i++) {
+    ghosts.push(createGhost(i));
+  }
 }
 
 function restartGame() {
-  if (lives <= 0) {
-    const message = { 
-      type: "showInterstitialAd",
-      state: "OnBeforeStartLevel",
-      timestamp: Date.now(),
-      gameId: "pac-man"
-    };
-    window.parent.postMessage(message, '*');
-    console.log(`Sent: ${JSON.stringify(message)}`);
-  }
-  score = 0;
-  lives = 3;
+    score = 0;
+    lives = 3;
+    currentLevel = 0;
+    gameOver = false;
+    nextLevelOverlay.classList.add("hidden");
+    initMap();
+    resetEntities();
+    updateUI();
+}
+
+function startNextLevel() {
+  currentLevel++;
   gameOver = false;
+  nextLevelOverlay.classList.add("hidden");
   initMap();
   resetEntities();
   updateUI();
@@ -208,6 +295,7 @@ function restartGame() {
 function updateUI() {
   scoreEl.textContent = score;
   livesEl.textContent = lives;
+  levelEl.textContent = currentLevel + 1;
 }
 
 function isWall(col, row) {
@@ -223,11 +311,8 @@ function trySetDirection(dx, dy) {
 function handleInput() {
   const centerCol = Math.round(pacman.x);
   const centerRow = Math.round(pacman.y);
-
   const offsetX = Math.abs(pacman.x - centerCol);
   const offsetY = Math.abs(pacman.y - centerRow);
-
-  // Allow direction change when reasonably aligned, or when stopped so first keypress works
   const aligned = offsetX < 0.35 && offsetY < 0.35;
   const stopped = pacman.dirX === 0 && pacman.dirY === 0;
 
@@ -243,12 +328,10 @@ function handleInput() {
 
 function movePacman(deltaSeconds) {
   handleInput();
-
   const speedPerFrame = pacman.speed * deltaSeconds;
   let newX = pacman.x + pacman.dirX * speedPerFrame;
   let newY = pacman.y + pacman.dirY * speedPerFrame;
 
-  // Tunnel wrap
   if (newX < 0) newX = cols - 1;
   if (newX > cols - 1) newX = 0;
 
@@ -256,7 +339,6 @@ function movePacman(deltaSeconds) {
   const nextRow = Math.round(newY);
 
   if (isWall(nextCol, nextRow)) {
-    // Block movement into wall; snap back to the corridor tile (the one we're in)
     const dx = pacman.dirX;
     const dy = pacman.dirY;
     pacman.dirX = 0;
@@ -269,7 +351,6 @@ function movePacman(deltaSeconds) {
   pacman.x = newX;
   pacman.y = newY;
 
-  // Eat pellets
   const col = Math.round(pacman.x);
   const row = Math.round(pacman.y);
   if (map[row] && (map[row][col] === 2 || map[row][col] === 3)) {
@@ -282,13 +363,15 @@ function movePacman(deltaSeconds) {
 
     if (pelletsRemaining <= 0) {
       gameOver = true;
-      setTimeout(() => alert("You cleared the maze! 🎉"), 100);
+      setTimeout(() => {
+        nextLevelOverlay.classList.remove("hidden");
+      }, 500);
     }
   }
 }
 
 function moveGhost(ghost, deltaSeconds) {
-  const speed = 6 * deltaSeconds;
+  const speed = (6 + currentLevel * 0.2) * deltaSeconds;
   let newX = ghost.x + ghost.dirX * speed;
   let newY = ghost.y + ghost.dirY * speed;
 
@@ -296,22 +379,25 @@ function moveGhost(ghost, deltaSeconds) {
   const nextRow = Math.round(newY);
 
   if (isWall(nextCol, nextRow)) {
-    // choose a new random direction (no 180° turn)
+    // Snap to center of current tile
+    ghost.x = Math.round(ghost.x);
+    ghost.y = Math.round(ghost.y);
+    
     const dirs = [
       { x: 1, y: 0 },
       { x: -1, y: 0 },
       { x: 0, y: 1 },
       { x: 0, y: -1 },
     ];
-    const currentOppX = -ghost.dirX;
-    const currentOppY = -ghost.dirY;
-
-    const valid = dirs.filter(
-      (d) => !(d.x === currentOppX && d.y === currentOppY)
-    );
-    const choice = valid[Math.floor(Math.random() * valid.length)];
-    ghost.dirX = choice.x;
-    ghost.dirY = choice.y;
+    
+    // Filter out directions that lead directly into a wall from the snapped position
+    const valid = dirs.filter(d => !isWall(ghost.x + d.x, ghost.y + d.y));
+    
+    if (valid.length > 0) {
+      const choice = valid[Math.floor(Math.random() * valid.length)];
+      ghost.dirX = choice.x;
+      ghost.dirY = choice.y;
+    }
     return;
   }
 
@@ -351,9 +437,7 @@ function drawMap() {
       const val = map[r][c];
       const x = c * corridorTile;
       const y = r * corridorTile;
-
       if (val === 1) {
-        // Wall: draw at same size (wallSize), centered in the wider corridor cell
         const wallX = x + (corridorTile - wallSize) / 2;
         const wallY = y + (corridorTile - wallSize) / 2;
         ctx.fillStyle = "#001b4d";
@@ -364,28 +448,15 @@ function drawMap() {
       } else {
         ctx.fillStyle = "#000016";
         ctx.fillRect(x, y, corridorTile, corridorTile);
-
         if (val === 2) {
           ctx.fillStyle = "#ffd966";
           ctx.beginPath();
-          ctx.arc(
-            x + corridorTile / 2,
-            y + corridorTile / 2,
-            2,
-            0,
-            Math.PI * 2
-          );
+          ctx.arc(x + corridorTile / 2, y + corridorTile / 2, 2, 0, Math.PI * 2);
           ctx.fill();
         } else if (val === 3) {
           ctx.fillStyle = "#ffd966";
           ctx.beginPath();
-          ctx.arc(
-            x + corridorTile / 2,
-            y + corridorTile / 2,
-            4,
-            0,
-            Math.PI * 2
-          );
+          ctx.arc(x + corridorTile / 2, y + corridorTile / 2, 4, 0, Math.PI * 2);
           ctx.fill();
         }
       }
@@ -394,45 +465,23 @@ function drawMap() {
 }
 
 function drawPacman() {
-  // Draw centered in the corridor cell (corridorTile)
   const px = pacman.x * corridorTile + corridorTile / 2;
   const py = pacman.y * corridorTile + corridorTile / 2;
-
-  const angleOffset =
-    pacman.dirX === 1
-      ? 0
-      : pacman.dirX === -1
-      ? Math.PI
-      : pacman.dirY === -1
-      ? -Math.PI / 2
-      : pacman.dirY === 1
-      ? Math.PI / 2
-      : 0;
-
-  // Animate mouth open/close (chomp) like the original game
+  const angleOffset = pacman.dirX === 1 ? 0 : pacman.dirX === -1 ? Math.PI : pacman.dirY === -1 ? -Math.PI / 2 : pacman.dirY === 1 ? Math.PI / 2 : 0;
   const chompSpeed = 18;
   const mouthOpen = 0.08 + 0.28 * (0.5 + 0.5 * Math.sin(gameTime * chompSpeed));
-
   ctx.fillStyle = "#ffd966";
   ctx.beginPath();
   ctx.moveTo(px, py);
-  ctx.arc(
-    px,
-    py,
-    corridorTile * 0.6,
-    angleOffset + mouthOpen,
-    angleOffset + Math.PI * 2 - mouthOpen
-  );
+  ctx.arc(px, py, corridorTile * 0.6, angleOffset + mouthOpen, angleOffset + Math.PI * 2 - mouthOpen);
   ctx.closePath();
   ctx.fill();
 }
 
 function drawGhost(ghost) {
-  // Draw centered on the ghost's tile so they don't appear half on wall
   const gx = (Math.round(ghost.x) * corridorTile) + corridorTile / 2;
   const gy = (Math.round(ghost.y) * corridorTile) + corridorTile / 2;
   const r = corridorTile * 0.6;
-
   ctx.fillStyle = ghost.color;
   ctx.beginPath();
   ctx.arc(gx, gy, r, Math.PI, 0);
@@ -440,14 +489,11 @@ function drawGhost(ghost) {
   ctx.lineTo(gx - r, gy + r);
   ctx.closePath();
   ctx.fill();
-
-  // eyes
   ctx.fillStyle = "#fff";
   ctx.beginPath();
   ctx.arc(gx - r / 3, gy - r / 4, r / 4, 0, Math.PI * 2);
   ctx.arc(gx + r / 3, gy - r / 4, r / 4, 0, Math.PI * 2);
   ctx.fill();
-
   ctx.fillStyle = "#000";
   ctx.beginPath();
   ctx.arc(gx - r / 3, gy - r / 4, r / 8, 0, Math.PI * 2);
@@ -463,17 +509,27 @@ function draw() {
 }
 
 function loop(timestamp) {
-  if (!lastTime) lastTime = timestamp;
+  if (!lastTime) {
+    lastTime = timestamp;
+    requestAnimationFrame(loop);
+    return;
+  }
+  
   const delta = (timestamp - lastTime) / 1000;
   lastTime = timestamp;
-  gameTime = timestamp / 1000;
 
+  // If delta is too large (e.g., after a tab switch or ad), skip this frame
+  if (delta > 0.1) {
+    requestAnimationFrame(loop);
+    return;
+  }
+
+  gameTime = timestamp / 1000;
   if (!gameOver) {
     movePacman(delta);
     ghosts.forEach((g) => moveGhost(g, delta));
     checkCollisions();
   }
-
   draw();
   requestAnimationFrame(loop);
 }
@@ -481,42 +537,27 @@ function loop(timestamp) {
 document.addEventListener("keydown", (e) => {
   startBackgroundSound();
   switch (e.key) {
-    case "ArrowUp":
-    case "w":
-    case "W":
-      e.preventDefault();
-      trySetDirection(0, -1);
-      break;
-    case "ArrowDown":
-    case "s":
-    case "S":
-      e.preventDefault();
-      trySetDirection(0, 1);
-      break;
-    case "ArrowLeft":
-    case "a":
-    case "A":
-      e.preventDefault();
-      trySetDirection(-1, 0);
-      break;
-    case "ArrowRight":
-    case "d":
-    case "D":
-      e.preventDefault();
-      trySetDirection(1, 0);
-      break;
-    default:
-      break;
+    case "ArrowUp": case "w": case "W": e.preventDefault(); trySetDirection(0, -1); break;
+    case "ArrowDown": case "s": case "S": e.preventDefault(); trySetDirection(0, 1); break;
+    case "ArrowLeft": case "a": case "A": e.preventDefault(); trySetDirection(-1, 0); break;
+    case "ArrowRight": case "d": case "D": e.preventDefault(); trySetDirection(1, 0); break;
   }
 });
 
 restartBtn.addEventListener("click", () => {
-  startBackgroundSound();
-  restartGame();
+    startBackgroundSound();
+    triggerAd("play_again", restartGame);
+});
+
+nextLevelBtn.addEventListener("click", () => {
+    triggerAd("next_level", startNextLevel);
 });
 
 initMap();
 resetEntities();
 updateUI();
 requestAnimationFrame(loop);
+
+// Initial ad trigger
+triggerAd("game_load");
 

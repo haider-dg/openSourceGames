@@ -29,11 +29,22 @@
             Lives:
             <span id="lives">3</span>
           </div>
+          <div class="level-label">
+            Level:
+            <span id="level">1</span>
+          </div>
           <button id="restartBtn" class="restart-btn">Restart 🔁</button>
         </div>
       </header>
 
       <main class="game-container">
+        <div id="nextLevelOverlay" class="next-level-overlay hidden">
+          <div class="modal">
+            <h2>Maze Cleared! 🎉</h2>
+            <p>Ready for the next challenge?</p>
+            <button id="nextLevelBtn">Next Level</button>
+          </div>
+        </div>
         <canvas id="gameCanvas" width="560" height="620"></canvas>
         <p class="hint">
           Use arrow keys or WASD to move. Collect all pellets, avoid ghosts!

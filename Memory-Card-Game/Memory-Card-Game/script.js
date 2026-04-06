@@ -1,8 +1,64 @@
 const cards = document.querySelectorAll(".card");
+const scoreTag = document.getElementById("score");
+const levelTag = document.getElementById("level");
+const restartOverlay = document.getElementById("restartOverlay");
+const restartBtn = document.getElementById("restartBtn");
 
 let matched = 0;
+let score = 0;
+let level = 1;
 let cardOne, cardTwo;
 let disableDeck = false;
+
+// Sounds
+const winSound = new Audio("level-complete.mp3");
+
+function playSound(audio) {
+    audio.currentTime = 0;
+    audio.play().catch(e => console.log("Sound play prevented:", e));
+}
+
+// localVars for Ads
+let lastAdTime = 0;
+const AD_COOLDOWN = 180000; // 3 minutes
+const localVars = {
+    vState: "game_restart",
+    vGameID: "memory_card_01"
+};
+let pendingAdCallback = null;
+
+function broadcastAdMessage(state = localVars.vState) {
+    const message = {
+        type: "showInterstitialAd",
+        state: state,
+        timestamp: Date.now(),
+        gameId: localVars.vGameID
+    };
+    window.parent.postMessage(message, "*");
+    console.log(`Sent: ${JSON.stringify(message)}`);
+}
+
+function triggerAd(state, callback) {
+    const now = Date.now();
+    if (now - lastAdTime >= AD_COOLDOWN) {
+        pendingAdCallback = callback;
+        broadcastAdMessage(state);
+    } else {
+        if (callback) callback();
+    }
+}
+
+window.addEventListener("message", (event) => {
+    if (event.data.type === "adSuccessfullyWatched") {
+        console.log("Received: Ad Watched");
+        lastAdTime = Date.now();
+        if (pendingAdCallback) {
+            const cb = pendingAdCallback;
+            pendingAdCallback = null;
+            cb();
+        }
+    }
+});
 
 function flipCard({target: clickedCard}) {
     if(cardOne !== clickedCard && !disableDeck) {
@@ -21,10 +77,13 @@ function flipCard({target: clickedCard}) {
 function matchCards(img1, img2) {
     if(img1 === img2) {
         matched++;
+        score += 50;
+        scoreTag.innerText = score;
         if(matched == 8) {
+            playSound(winSound);
             setTimeout(() => {
-                return shuffleCard();
-            }, 1000);
+                restartOverlay.classList.remove("hidden");
+            }, 500);
         }
         cardOne.removeEventListener("click", flipCard);
         cardTwo.removeEventListener("click", flipCard);
@@ -58,8 +117,15 @@ function shuffleCard() {
     });
 }
 
-shuffleCard();
-    
-cards.forEach(card => {
-    card.addEventListener("click", flipCard);
+function nextLevel() {
+    level++;
+    levelTag.innerText = level;
+    restartOverlay.classList.add("hidden");
+    shuffleCard();
+}
+
+restartBtn.addEventListener("click", () => {
+    triggerAd("play_again", nextLevel);
 });
+
+shuffleCard();

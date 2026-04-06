@@ -29,6 +29,44 @@ const zoom = 2;
 
 const chickenSize = 15;
 
+// Sounds
+const moveSound = new Audio("move_sound.mp3");
+const crashSound = new Audio("car-crash-sound.mp3");
+
+function playSound(audio) {
+  audio.currentTime = 0;
+  audio.play().catch(e => console.log("Sound play prevented:", e));
+}
+let lastAdTime = 0;
+const vGameID = "crossy_road_master_01";
+let pendingAdCallback = null;
+
+function broadcastAdMessage(state = "ingame_milestone") {
+  const message = {
+    type: "showInterstitialAd",
+    state: state,
+    timestamp: Date.now(),
+    gameId: vGameID
+  };
+  window.parent.postMessage(message, "*");
+}
+
+function triggerAd(state, callback) {
+  pendingAdCallback = callback;
+  broadcastAdMessage(state);
+}
+
+window.addEventListener("message", (event) => {
+  if (event.data.type === "adSuccessfullyWatched") {
+    lastAdTime = Date.now();
+    if (pendingAdCallback) {
+      const cb = pendingAdCallback;
+      pendingAdCallback = null;
+      cb();
+    }
+  }
+});
+
 const positionWidth = 42;
 const columns = 17;
 const boardWidth = positionWidth * columns;
@@ -149,6 +187,15 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
+
+window.addEventListener("resize", () => {
+  camera.left = window.innerWidth / -2;
+  camera.right = window.innerWidth / 2;
+  camera.top = window.innerHeight / 2;
+  camera.bottom = window.innerHeight / -2;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
 
 function Texture(width, height, rects) {
   const canvas = document.createElement("canvas");
@@ -489,9 +536,11 @@ function Lane(index) {
 }
 
 document.querySelector("#retry").addEventListener("click", () => {
-  lanes.forEach((lane) => scene.remove(lane.mesh));
-  initaliseValues();
-  endDOM.style.visibility = "hidden";
+  triggerAd("retry", () => {
+    lanes.forEach((lane) => scene.remove(lane.mesh));
+    initaliseValues();
+    endDOM.style.visibility = "hidden";
+  });
 });
 
 document
@@ -507,6 +556,9 @@ document.getElementById("left").addEventListener("click", () => move("left"));
 document.getElementById("right").addEventListener("click", () => move("right"));
 
 window.addEventListener("keydown", (event) => {
+  if ([37, 38, 39, 40].includes(event.keyCode)) {
+    event.preventDefault();
+  }
   if (event.keyCode == "38") {
     // up arrow
     move("forward");
@@ -523,6 +575,7 @@ window.addEventListener("keydown", (event) => {
 });
 
 function move(direction) {
+  if (endDOM.style.visibility === "visible") return;
   const finalPositions = moves.reduce(
     (position, move) => {
       if (move === "forward")
@@ -579,6 +632,7 @@ function move(direction) {
     if (!stepStartTimestamp) startMoving = true;
   }
   moves.push(direction);
+  playSound(moveSound);
 }
 
 function animate(timestamp) {
@@ -706,6 +760,9 @@ function animate(timestamp) {
       const carMinX = vechicle.position.x - (vechicleLength * zoom) / 2;
       const carMaxX = vechicle.position.x + (vechicleLength * zoom) / 2;
       if (chickenMaxX > carMinX && chickenMinX < carMaxX) {
+        if (endDOM.style.visibility !== "visible") {
+          playSound(crashSound);
+        }
         endDOM.style.visibility = "visible";
       }
     });

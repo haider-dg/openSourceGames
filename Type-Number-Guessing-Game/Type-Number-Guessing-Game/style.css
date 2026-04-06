@@ -8,14 +8,21 @@
 }
 
 body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  min-height: 100vh;
-  background: #db3069;
-}
+  /* width: 100vw; */
+  height: 100vh;
+  background:
+    linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+    url("bg.png");
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
 
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
 h1 {
   font-size: 24px;
   margin-bottom: 20px;
@@ -86,6 +93,27 @@ input[type="number"] {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #333;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.restartBtn {
+    background-color: #28a745;
+}
+
+.hidden {
+    display: none !important;
 }
 
 .checkBtn:active {

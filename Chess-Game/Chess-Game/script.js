@@ -23,6 +23,13 @@
   let lastMoveFrom = null;
   let pendingPromotion = null;
   let gameOver = false;
+  let lastAdTime = 0;
+  const AD_COOLDOWN = 180000; // 3 minutes
+  const localVars = {
+    vState: "game_restart",
+    vGameID: "chess_game_01"
+  };
+  let pendingAdCallback = null;
 
   const boardEl = document.getElementById("board");
   const modeScreen = document.getElementById("modeScreen");
@@ -192,13 +199,19 @@
           if (r === startRow && !getPiece(r + 2 * forward, c)) moves.push([r + 2 * forward, c]);
         }
       }
-      [[r + forward, c - 1], [r + forward, c + 1]].forEach(([r1, c1]) => {
-        if (!inBounds(r1, c1)) return;
-        const target = getPiece(r1, c1);
-        if (target && target.color !== color) moves.push([r1, c1]);
-        if (!forAttackOnly && lastMove && lastMove.piece === "P" && lastMove.fromC === lastMove.toC && lastMove.toR === r && lastMove.fromR === r + 2 * forward && lastMove.toC === c1)
-          moves.push([r1, c1]);
-      });
+      if (forAttackOnly) {
+        [[r + forward, c - 1], [r + forward, c + 1]].forEach(([r1, c1]) => {
+          if (inBounds(r1, c1)) moves.push([r1, c1]);
+        });
+      } else {
+        [[r + forward, c - 1], [r + forward, c + 1]].forEach(([r1, c1]) => {
+          if (!inBounds(r1, c1)) return;
+          const target = getPiece(r1, c1);
+          if (target && target.color !== color) moves.push([r1, c1]);
+          if (lastMove && lastMove.piece === "P" && lastMove.fromC === lastMove.toC && lastMove.toR === r && lastMove.fromR === r + 2 * forward && lastMove.toC === c1)
+            moves.push([r1, c1]);
+        });
+      }
     }
 
     return moves;
@@ -210,7 +223,7 @@
     const raw = getRawMoves(r, c, false);
     const legal = [];
     const kr = piece.type === "K" ? r : getKingPos(turn)[0];
-    const kc = piece.type === "K" ? r : getKingPos(turn)[1];
+    const kc = piece.type === "K" ? c : getKingPos(turn)[1];
 
     for (const [toR, toC] of raw) {
       const captured = board[toR][toC];
@@ -305,7 +318,7 @@
       }
     }
 
-    if (piece.type === "P" && lastMove && lastMove.piece === "P" && Math.abs(lastMove.fromC - lastMove.toC) === 1 && lastMove.toR === fromR && lastMove.fromR === fromR + (piece.color === "w" ? -2 : 2) && lastMove.toC === toC) {
+    if (piece.type === "P" && lastMove && lastMove.piece === "P" && lastMove.fromC === lastMove.toC && lastMove.toR === fromR && lastMove.fromR === fromR + (piece.color === "w" ? -2 : 2) && lastMove.toC === toC) {
       board[lastMove.toR][lastMove.toC] = null;
     }
 
@@ -470,6 +483,21 @@
   }
 
   function afterMove() {
+    if (!getKingPos("w")) {
+      gameOver = true;
+      gameOverTitle.textContent = "Black Wins!";
+      gameOverMessage.textContent = "White King has been captured.";
+      gameOverOverlay.classList.remove("hidden");
+      return;
+    }
+    if (!getKingPos("b")) {
+      gameOver = true;
+      gameOverTitle.textContent = "White Wins!";
+      gameOverMessage.textContent = "Black King has been captured.";
+      gameOverOverlay.classList.remove("hidden");
+      return;
+    }
+
     if (isCheckmate("w")) {
       gameOver = true;
       gameOverTitle.textContent = "Checkmate!";
@@ -514,6 +542,39 @@
       }, 300);
     }
   }
+
+  function broadcastAdMessage(state = localVars.vState) {
+    const message = {
+      type: "showInterstitialAd",
+      state: state,
+      timestamp: Date.now(),
+      gameId: localVars.vGameID
+    };
+    window.parent.postMessage(message, "*");
+    console.log(`Sent: ${JSON.stringify(message)}`);
+  }
+
+  function triggerAd(state, callback) {
+    const now = Date.now();
+    if (now - lastAdTime >= AD_COOLDOWN) {
+      pendingAdCallback = callback;
+      broadcastAdMessage(state);
+    } else {
+      callback();
+    }
+  }
+
+  window.addEventListener("message", (event) => {
+    if (event.data.type === "adSuccessfullyWatched") {
+      console.log("Received: Ad Watched");
+      lastAdTime = Date.now();
+      if (pendingAdCallback) {
+        const cb = pendingAdCallback;
+        pendingAdCallback = null;
+        cb();
+      }
+    }
+  });
 
   function onSquareClick(r, c) {
     if (gameOver || pendingPromotion) return;
@@ -568,8 +629,12 @@
     bindBoard();
   }
 
-  document.getElementById("vsFriendBtn").addEventListener("click", () => showGame("friend"));
-  document.getElementById("vsAiBtn").addEventListener("click", () => showGame("ai"));
+  document.getElementById("vsFriendBtn").addEventListener("click", () => {
+    triggerAd("game_start_friend", () => showGame("friend"));
+  });
+  document.getElementById("vsAiBtn").addEventListener("click", () => {
+    triggerAd("game_start_ai", () => showGame("ai"));
+  });
 
   document.getElementById("newGameBtn").addEventListener("click", () => {
     initBoard();
@@ -579,14 +644,18 @@
   });
 
   document.getElementById("changeModeBtn").addEventListener("click", () => {
-    modeScreen.classList.remove("hidden");
-    gameScreen.classList.add("hidden");
-    gameOverOverlay.classList.add("hidden");
+    triggerAd("change_mode", () => {
+      modeScreen.classList.remove("hidden");
+      gameScreen.classList.add("hidden");
+      gameOverOverlay.classList.add("hidden");
+    });
   });
 
   document.getElementById("playAgainBtn").addEventListener("click", () => {
-    modeScreen.classList.remove("hidden");
-    gameScreen.classList.add("hidden");
-    gameOverOverlay.classList.add("hidden");
+    triggerAd("play_again", () => {
+      modeScreen.classList.remove("hidden");
+      gameScreen.classList.add("hidden");
+      gameOverOverlay.classList.add("hidden");
+    });
   });
 })();

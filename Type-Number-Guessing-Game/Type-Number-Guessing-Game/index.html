@@ -24,10 +24,15 @@
 
     <h1>Number Guessing Game</h1>
     <div class="container">
+        <div class="stats-container">
+            <p>Won: <span id="winCount">0</span></p>
+            <p>Lost: <span id="lossCount">0</span></p>
+        </div>
         <h2 class="heading">Guess a number between 1 to 100</h2>
         <input type="number" placeholder="Guess a number" />
         <p class="guess"></p>
         <button class="checkBtn">Check</button>
+        <button class="restartBtn hidden">Play Again...😉</button>
         <p class="chances">You have only <span class="chance">10</span> chances</p>
     </div>
 

@@ -3,30 +3,37 @@
   box-sizing: border-box;
 }
 
+
+
 body {
-  background-image: url('https://raw.githubusercontent.com/arpit456jain/Amazing-Js-Projects/master/Candy%20Crush/utils/bg.png');
+  height: 100vh;
+  background:
+    url("bg.png");
   background-size: cover;
-  background-position: center;
+  background-position: top;
   display: flex;
-  flex-direction: row; /* Horizontal layout */
-  flex-wrap: wrap; /* Stack on small screens */
+  flex-direction: row;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   margin: 0;
-  overflow: hidden; /* Prevent scrollbars */
+  overflow: hidden;
   font-family: 'Montserrat', sans-serif;
   color: #85796b;
   padding: 20px;
-  gap: 40px; /* Space between scoreboard and grid */
+  gap: 40px;
 }
 
 .grid {
-  display: none; /* Initially hidden */
+  display: none;
+  /* Initially hidden */
   flex-wrap: wrap;
-  width: 80vmin; /* Slightly smaller to allow for scoreboard on the side */
+  width: 80vmin;
+  /* Slightly smaller to allow for scoreboard on the side */
   height: 80vmin;
-  max-width: 500px; /* Cap size for larger screens to ensure it fits with scoreboard */
+  max-width: 500px;
+  /* Cap size for larger screens to ensure it fits with scoreboard */
   max-height: 500px;
   background-color: rgba(109, 127, 151, 0.5);
   padding: 5px;
@@ -36,7 +43,8 @@ body {
 }
 
 .grid div {
-  height: 12.5%; /* 100% / 8 squares */
+  height: 12.5%;
+  /* 100% / 8 squares */
   width: 12.5%;
   background-size: contain;
   background-repeat: no-repeat;
@@ -47,23 +55,26 @@ body {
 
 /* Hover effect for interactivity */
 .grid div:hover {
-    transform: scale(1.05); /* Slightly enlarge on hover */
+  transform: scale(1.05);
+  /* Slightly enlarge on hover */
 }
 
 /* Scoreboard Styling */
 .scoreBoard {
-  display: none; /* Initially hidden */
+  display: none;
+  /* Initially hidden */
   background-color: rgba(0, 255, 255, 0.82);
   border-radius: 20px;
   width: 200px;
   padding: 20px;
-  flex-direction: column; /* Vertical layout for scoreboard */
+  flex-direction: column;
+  /* Vertical layout for scoreboard */
   justify-content: center;
   align-items: center;
   text-align: center;
   gap: 15px;
   margin: 0;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   border: 2px solid white;
 }
 
@@ -78,7 +89,8 @@ body {
 }
 
 .grid div:hover {
-    transform: scale(1.05); /* Slightly enlarge on hover */
+  transform: scale(1.05);
+  /* Slightly enlarge on hover */
 }
 
 /* Mode Selection Styling */
@@ -104,7 +116,8 @@ body {
   color: #333;
 }
 
-#modeSelection button, #changeMode {
+#modeSelection button,
+#changeMode {
   margin: 10px;
   padding: 12px 24px;
   font-size: 18px;
@@ -114,10 +127,11 @@ body {
   border-radius: 8px;
   color: white;
   transition: background-color 0.3s, transform 0.2s;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-#modeSelection button:hover, #changeMode:hover {
+#modeSelection button:hover,
+#changeMode:hover {
   background-color: #00bfff;
   transform: translateY(-2px);
 }
@@ -146,16 +160,19 @@ body {
 
 /* Restart Overlay */
 #restartOverlay {
-  display: none; /* Initially hidden */
+  display: none;
+  /* Initially hidden */
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.85); /* Darker backdrop */
+  background-color: rgba(0, 0, 0, 0.85);
+  /* Darker backdrop */
   z-index: 50;
   border-radius: 10px;
-  flex-direction: column; /* Stack elements vertically */
+  flex-direction: column;
+  /* Stack elements vertically */
   justify-content: center;
   align-items: center;
   gap: 20px;
@@ -167,8 +184,9 @@ body {
 #finalScore {
   font-size: 2rem;
   margin: 0;
-  color: #ffeb3b; /* Bright yellow for visibility */
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  color: #ffeb3b;
+  /* Bright yellow for visibility */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 #restartButton {
@@ -179,7 +197,7 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s, background-color 0.2s;
   width: 200px;
 }
@@ -192,7 +210,8 @@ body {
 #changeModeRestart {
   padding: 10px 20px;
   font-size: 18px;
-  background-color: #f44336; /* Red for secondary action */
+  background-color: #f44336;
+  /* Red for secondary action */
   color: white;
   border: none;
   border-radius: 8px;
@@ -207,10 +226,12 @@ body {
 }
 
 .grid {
-  position: relative; /* Ensure overlay is positioned relative to the grid */
+  position: relative;
+  /* Ensure overlay is positioned relative to the grid */
 }
 
 /* Initially Hide Game Elements */
-.grid, .scoreBoard {
+.grid,
+.scoreBoard {
   display: none;
 }

@@ -16,41 +16,52 @@ html {
 }
 
 body {
-  padding: 0;
   margin: 0;
-  font-family: "Nunito", sans-serif;
-  background: #fff9e2;
-  text-align: center;
+  height: 100vh;
+  background: url("bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  gap: 1rem;
 }
 
 h1 {
-  font-size: 4.5rem;
+  font-size: clamp(3rem, 8vw, 4.5rem);
   line-height: 1;
-  margin: 2rem 0 0 0;
+  margin: 0;
   color: #ff7660;
+  text-align: center;
 }
 
 h2 {
-  font-size: 3rem;
+  font-size: clamp(2rem, 5vw, 3rem);
   color: #3b1010;
-  margin: 2rem;
+  margin: 0;
+  text-align: center;
 }
 
 .score {
   background: #ffe5cf;
-  padding: 0 3rem;
+  padding: 0.5rem 3rem;
   line-height: 1;
-  -webkit-border-radius: 1rem;
-  -moz-border-radius: 1rem;
   border-radius: 1rem;
   color: #3b1010;
+  display: inline-block;
 }
 
 .game {
-  width: 600px;
-  height: 400px;
-  display: -webkit-box;
-  display: -webkit-flex;
+  width: 95%;
+  max-width: 600px;
+  height: auto;
+  min-height: 300px;
+  max-height: 60vh;
   display: flex;
   flex-wrap: wrap;
   margin: 0 auto;

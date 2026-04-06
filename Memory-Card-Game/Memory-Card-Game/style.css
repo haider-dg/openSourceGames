@@ -6,18 +6,79 @@
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
 }
-body{
+body {
+  width: 100vw;
+  height: 100vh;
+  background:
+    linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+    url("bg.png");
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+
+  color: white;
   display: flex;
-  align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background: #6563FF;
+  align-items: center;
+  flex-direction: column;
 }
 .wrapper{
+  position: relative;
   padding: 25px;
   border-radius: 10px;
   background: #F8F8F8;
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+.game-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  color: #333;
+  font-weight: 500;
+  font-size: 18px;
+}
+.hidden {
+  display: none !important;
+}
+.restart-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  z-index: 10;
+}
+.modal {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  color: #333;
+}
+.modal h2 {
+  margin-bottom: 10px;
+  color: #2ecc71;
+}
+.modal p {
+  margin-bottom: 20px;
+}
+.modal button {
+  padding: 10px 25px;
+  background: #6563ff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.modal button:hover {
+  background: #4e4cf1;
 }
 .cards, .card, .view{
   display: flex;
