@@ -8,6 +8,8 @@ const finalMessageRevealWord = document.getElementById(
   "final-message-reveal-word"
 );
 const figureParts = document.querySelectorAll(".figure-part");
+const mobileInput = document.getElementById("mobile-input");
+
 
 const words = [
   "adventure",
@@ -125,9 +127,9 @@ function showNotification() {
   }, 2000);
 }
 
-window.addEventListener("keypress", (e) => {
+function handleLetterInput(letter) {
   if (playable) {
-    const letter = e.key.toLowerCase();
+    letter = letter.toLowerCase();
     if (letter >= "a" && letter <= "z") {
       if (selectedWord.includes(letter)) {
         if (!correctLetters.includes(letter)) {
@@ -146,7 +148,26 @@ window.addEventListener("keypress", (e) => {
       }
     }
   }
+}
+
+window.addEventListener("keypress", (e) => {
+  handleLetterInput(e.key);
 });
+
+// Mobile keyboard support
+document.body.addEventListener("click", () => {
+  mobileInput.focus();
+});
+
+mobileInput.addEventListener("input", (e) => {
+  const value = e.target.value;
+  if (value.length > 0) {
+    const lastChar = value[value.length - 1];
+    handleLetterInput(lastChar);
+    e.target.value = ""; // Clear for next input
+  }
+});
+
 
 function broadcastAdMessage(state = localVars.vState) {
   const message = {

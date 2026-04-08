@@ -43,6 +43,41 @@ function candyCrushGame() {
     // Sound Effects
     const matchSound = new Audio("crush_sound.mp3");
 
+    // Background sound logic
+    const bgSound = document.getElementById("bg-sound");
+    function playBackgroundSound() {
+        if (bgSound) {
+            bgSound.play().catch(function(error) {
+                console.error("Background audio playback failed:", error);
+            });
+            document.removeEventListener("keydown", playBackgroundSound);
+            document.removeEventListener("click", playBackgroundSound);
+            document.removeEventListener("touchstart", playBackgroundSound);
+        }
+    }
+    document.addEventListener("keydown", playBackgroundSound);
+    document.addEventListener("click", playBackgroundSound);
+    document.addEventListener("touchstart", playBackgroundSound);
+
+    // Sound toggle logic
+    const soundToggle = document.getElementById("sound-toggle");
+    const onIcon = document.getElementById("sound-on-icon");
+    const offIcon = document.getElementById("sound-off-icon");
+
+    if (soundToggle && bgSound) {
+        soundToggle.addEventListener("click", function () {
+            if (bgSound.muted) {
+                bgSound.muted = false;
+                onIcon.style.display = "block";
+                offIcon.style.display = "none";
+            } else {
+                bgSound.muted = true;
+                onIcon.style.display = "none";
+                offIcon.style.display = "block";
+            }
+        });
+    }
+
     function playMatchSound() {
         matchSound.currentTime = 0;
         matchSound.play().catch(e => console.log("Sound play prevented:", e));
