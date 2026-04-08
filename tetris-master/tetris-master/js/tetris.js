@@ -8,19 +8,19 @@ var currentX, currentY; // position of current shape
 var freezed; // is current shape settled on the board?
 var score = 0;
 var shapes = [
-    [ 1, 1, 1, 1 ],
-    [ 1, 1, 1, 0,
-      1 ],
-    [ 1, 1, 1, 0,
-      0, 0, 1 ],
-    [ 1, 1, 0, 0,
-      1, 1 ],
-    [ 1, 1, 0, 0,
-      0, 1, 1 ],
-    [ 0, 1, 1, 0,
-      1, 1 ],
-    [ 0, 1, 0, 0,
-      1, 1, 1 ]
+    [1, 1, 1, 1],
+    [1, 1, 1, 0,
+        1],
+    [1, 1, 1, 0,
+        0, 0, 1],
+    [1, 1, 0, 0,
+        1, 1],
+    [1, 1, 0, 0,
+        0, 1, 1],
+    [0, 1, 1, 0,
+        1, 1],
+    [0, 1, 0, 0,
+        1, 1, 1]
 ];
 var colors = [
     '#00f0f0', '#f0a000', '#0000f0', '#f0f000', '#f00000', '#00f000', '#a000f0'
@@ -62,23 +62,23 @@ window.addEventListener("message", (event) => {
 // creates a new 4x4 shape in global variable 'current'
 // 4x4 so as to cover the size when the shape is rotated
 function newShape() {
-    var id = Math.floor( Math.random() * shapes.length );
-    var shape = shapes[ id ]; // maintain id for color filling
+    var id = Math.floor(Math.random() * shapes.length);
+    var shape = shapes[id]; // maintain id for color filling
 
     current = [];
-    for ( var y = 0; y < 4; ++y ) {
-        current[ y ] = [];
-        for ( var x = 0; x < 4; ++x ) {
+    for (var y = 0; y < 4; ++y) {
+        current[y] = [];
+        for (var x = 0; x < 4; ++x) {
             var i = 4 * y + x;
-            if ( typeof shape[ i ] != 'undefined' && shape[ i ] ) {
-                current[ y ][ x ] = id + 1;
+            if (typeof shape[i] != 'undefined' && shape[i]) {
+                current[y][x] = id + 1;
             }
             else {
-                current[ y ][ x ] = 0;
+                current[y][x] = 0;
             }
         }
     }
-    
+
     // new shape starts to move
     freezed = false;
     // position where the shape will evolve
@@ -88,10 +88,10 @@ function newShape() {
 
 // clears the board
 function init() {
-    for ( var y = 0; y < ROWS; ++y ) {
-        board[ y ] = [];
-        for ( var x = 0; x < COLS; ++x ) {
-            board[ y ][ x ] = 0;
+    for (var y = 0; y < ROWS; ++y) {
+        board[y] = [];
+        for (var x = 0; x < COLS; ++x) {
+            board[y][x] = 0;
         }
     }
     score = 0;
@@ -104,7 +104,7 @@ function updateScoreDisplay() {
 
 // keep the element moving down, creating new shapes and clearing lines
 function tick() {
-    if ( valid( 0, 1 ) ) {
+    if (valid(0, 1)) {
         ++currentY;
     }
     // if the element settled
@@ -123,10 +123,10 @@ function tick() {
 
 // stop shape at its position and fix it to board
 function freeze() {
-    for ( var y = 0; y < 4; ++y ) {
-        for ( var x = 0; x < 4; ++x ) {
-            if ( current[ y ][ x ] ) {
-                board[ y + currentY ][ x + currentX ] = current[ y ][ x ];
+    for (var y = 0; y < 4; ++y) {
+        for (var x = 0; x < 4; ++x) {
+            if (current[y][x]) {
+                board[y + currentY][x + currentX] = current[y][x];
             }
         }
     }
@@ -134,12 +134,12 @@ function freeze() {
 }
 
 // returns rotates the rotated shape 'current' perpendicularly anticlockwise
-function rotate( current ) {
+function rotate(current) {
     var newCurrent = [];
-    for ( var y = 0; y < 4; ++y ) {
-        newCurrent[ y ] = [];
-        for ( var x = 0; x < 4; ++x ) {
-            newCurrent[ y ][ x ] = current[ 3 - x ][ y ];
+    for (var y = 0; y < 4; ++y) {
+        newCurrent[y] = [];
+        for (var x = 0; x < 4; ++x) {
+            newCurrent[y][x] = current[3 - x][y];
         }
     }
 
@@ -149,20 +149,25 @@ function rotate( current ) {
 // check if any lines are filled and clear them
 function clearLines() {
     var linesCleared = 0;
-    for ( var y = ROWS - 1; y >= 0; --y ) {
+    for (var y = ROWS - 1; y >= 0; --y) {
         var rowFilled = true;
-        for ( var x = 0; x < COLS; ++x ) {
-            if ( board[ y ][ x ] == 0 ) {
+        for (var x = 0; x < COLS; ++x) {
+            if (board[y][x] == 0) {
                 rowFilled = false;
                 break;
             }
         }
-        if ( rowFilled ) {
+        if (rowFilled) {
             linesCleared++;
-            document.getElementById( 'clearsound' ).play();
-            for ( var yy = y; yy > 0; --yy ) {
-                for ( var x = 0; x < COLS; ++x ) {
-                    board[ yy ][ x ] = board[ yy - 1 ][ x ];
+            const clearsound = document.getElementById('clearsound');
+            const bgSound = document.getElementById('bg-sound');
+            if (clearsound && (!bgSound || !bgSound.muted)) {
+                clearsound.currentTime = 0;
+                clearsound.play();
+            }
+            for (var yy = y; yy > 0; --yy) {
+                for (var x = 0; x < COLS; ++x) {
+                    board[yy][x] = board[yy - 1][x];
                 }
             }
             ++y;
@@ -174,33 +179,33 @@ function clearLines() {
     }
 }
 
-function keyPress( key ) {
+function keyPress(key) {
     if (gameEnded) return;
 
-    switch ( key ) {
+    switch (key) {
         case 'left':
-            if ( valid( -1 ) ) {
+            if (valid(-1)) {
                 --currentX;
             }
             break;
         case 'right':
-            if ( valid( 1 ) ) {
+            if (valid(1)) {
                 ++currentX;
             }
             break;
         case 'down':
-            if ( valid( 0, 1 ) ) {
+            if (valid(0, 1)) {
                 ++currentY;
             }
             break;
         case 'rotate':
-            var rotated = rotate( current );
-            if ( valid( 0, 0, rotated ) ) {
+            var rotated = rotate(current);
+            if (valid(0, 0, rotated)) {
                 current = rotated;
             }
             break;
         case 'drop':
-            while( valid(0, 1) ) {
+            while (valid(0, 1)) {
                 ++currentY;
             }
             tick();
@@ -209,25 +214,25 @@ function keyPress( key ) {
 }
 
 // checks if the resulting position of current shape will be feasible
-function valid( offsetX, offsetY, newCurrent ) {
+function valid(offsetX, offsetY, newCurrent) {
     offsetX = offsetX || 0;
     offsetY = offsetY || 0;
     offsetX = currentX + offsetX;
     offsetY = currentY + offsetY;
     newCurrent = newCurrent || current;
 
-    for ( var y = 0; y < 4; ++y ) {
-        for ( var x = 0; x < 4; ++x ) {
-            if ( newCurrent[ y ][ x ] ) {
-                if ( typeof board[ y + offsetY ] == 'undefined'
-                  || typeof board[ y + offsetY ][ x + offsetX ] == 'undefined'
-                  || board[ y + offsetY ][ x + offsetX ]
-                  || x + offsetX < 0
-                  || y + offsetY >= ROWS
-                  || x + offsetX >= COLS ) {
+    for (var y = 0; y < 4; ++y) {
+        for (var x = 0; x < 4; ++x) {
+            if (newCurrent[y][x]) {
+                if (typeof board[y + offsetY] == 'undefined'
+                    || typeof board[y + offsetY][x + offsetX] == 'undefined'
+                    || board[y + offsetY][x + offsetX]
+                    || x + offsetX < 0
+                    || y + offsetY >= ROWS
+                    || x + offsetX >= COLS) {
                     if (offsetY == 1 && freezed && currentY <= 1) {
                         lose = true; // lose if the current shape is settled at the top most row
-                    } 
+                    }
                     return false;
                 }
             }
@@ -265,14 +270,53 @@ var gameEnded = false;
 function newGame() {
     gameEnded = false;
     clearAllIntervals();
-    intervalRender = setInterval( render, 30 );
+    intervalRender = setInterval(render, 30);
     init();
     newShape();
     lose = false;
-    interval = setInterval( tick, 400 );
+    interval = setInterval(tick, 400);
 }
 
-function clearAllIntervals(){
-    clearInterval( interval );
-    clearInterval( intervalRender );
+function clearAllIntervals() {
+    clearInterval(interval);
+    clearInterval(intervalRender);
 }
+
+// Background Sound Logic
+(function () {
+    const bgSound = document.getElementById("bg-sound");
+    const soundToggle = document.getElementById("sound-toggle");
+    const onIcon = document.getElementById("sound-on-icon");
+    const offIcon = document.getElementById("sound-off-icon");
+    bgSound.volume = 0.15;
+    function playBackgroundSound() {
+        if (bgSound) {
+            bgSound.play().then(() => {
+                document.removeEventListener("keydown", playBackgroundSound);
+                document.removeEventListener("click", playBackgroundSound);
+                document.removeEventListener("touchstart", playBackgroundSound);
+            }).catch(function (error) {
+                console.log("Background audio playback failed or prevented:", error);
+            });
+        }
+    }
+
+    document.addEventListener("keydown", playBackgroundSound);
+    document.addEventListener("click", playBackgroundSound);
+    document.addEventListener("touchstart", playBackgroundSound);
+
+    if (soundToggle && bgSound) {
+        soundToggle.addEventListener("click", function (e) {
+            e.stopPropagation();
+            if (bgSound.muted) {
+                bgSound.muted = false;
+                onIcon.style.display = "block";
+                offIcon.style.display = "none";
+            } else {
+                bgSound.muted = true;
+                onIcon.style.display = "none";
+                offIcon.style.display = "block";
+            }
+        });
+    }
+})();

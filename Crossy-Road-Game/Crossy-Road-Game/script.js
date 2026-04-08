@@ -42,17 +42,24 @@ function playSound(audio) {
 const bgSound = document.getElementById("bg-sound");
 function playBackgroundSound() {
   if (bgSound) {
-    bgSound.play().catch(function (error) {
-      console.error("Background audio playback failed:", error);
+    bgSound.play().then(() => {
+      document.removeEventListener("keydown", playBackgroundSound);
+      document.removeEventListener("click", playBackgroundSound);
+      document.removeEventListener("touchstart", playBackgroundSound);
+      window.removeEventListener("load", playBackgroundSound);
+    }).catch(function (error) {
+      console.log("Background audio playback failed or prevented:", error);
     });
-    document.removeEventListener("keydown", playBackgroundSound);
-    document.removeEventListener("click", playBackgroundSound);
-    document.removeEventListener("touchstart", playBackgroundSound);
   }
 }
+
 document.addEventListener("keydown", playBackgroundSound);
 document.addEventListener("click", playBackgroundSound);
 document.addEventListener("touchstart", playBackgroundSound);
+window.addEventListener("load", playBackgroundSound);
+
+// Initial attempt to play when script loads
+playBackgroundSound();
 
 // Sound toggle logic
 const soundToggle = document.getElementById("sound-toggle");

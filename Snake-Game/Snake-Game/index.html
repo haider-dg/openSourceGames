@@ -35,8 +35,14 @@
     <div class="wrapper">
       <div class="game-details">
         <span class="score">Score: 0</span>
-        <span class="high-score">High Score: 0</span>
+        <div class="high-score-wrapper">
+          <span class="high-score">High Score: 0</span>
+          <button id="sound-toggle" class="sound-toggle" aria-label="Toggle Sound">
+            <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+          </button>
+        </div>
       </div>
+      <audio id="bg-sound" src="Snake-bg-sound.mp3" loop></audio>
       <div class="play-board"></div>
       <div class="controls">
         <i data-key="ArrowLeft" class="fa-solid fa-arrow-left-long"></i>

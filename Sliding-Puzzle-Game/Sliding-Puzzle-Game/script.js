@@ -158,6 +158,45 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    const bgSound = $("#bg-sound");
+    const soundToggle = $("#sound-toggle");
+    const onIcon = $("#sound-on-icon");
+    const offIcon = $("#sound-off-icon");
+
+    function playBackgroundSound() {
+      if (bgSound) {
+        bgSound.play().then(() => {
+          document.removeEventListener("keydown", playBackgroundSound);
+          document.removeEventListener("click", playBackgroundSound);
+          document.removeEventListener("touchstart", playBackgroundSound);
+          window.removeEventListener("load", playBackgroundSound);
+        }).catch(function (error) {
+          console.log("Background audio playback failed or prevented:", error);
+        });
+      }
+    }
+
+    document.addEventListener("keydown", playBackgroundSound);
+    document.addEventListener("click", playBackgroundSound);
+    document.addEventListener("touchstart", playBackgroundSound);
+    window.addEventListener("load", playBackgroundSound);
+    playBackgroundSound();
+
+    if (soundToggle && bgSound) {
+      soundToggle.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (bgSound.muted) {
+          bgSound.muted = false;
+          onIcon.style.display = "block";
+          offIcon.style.display = "none";
+        } else {
+          bgSound.muted = true;
+          onIcon.style.display = "none";
+          offIcon.style.display = "block";
+        }
+      });
+    }
+
     $$(".level-btn").forEach((btn) => {
       btn.addEventListener("click", () => startGame(btn.dataset.level));
     });

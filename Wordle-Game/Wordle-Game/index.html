@@ -16,8 +16,14 @@
     <link rel="icon" href="https://i.ibb.co/M6KTWnf/pic.jpg" />
     <link rel="stylesheet" href="style.css" />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   </head>
   <body>
+    <button id="sound-toggle" class="sound-toggle" aria-label="Toggle Sound">
+      <i id="sound-on-icon" class="fas fa-volume-high"></i>
+      <i id="sound-off-icon" class="fas fa-volume-xmark" style="display:none;"></i>
+    </button>
+    <audio id="bg-sound" src="wordle-bg-sound.mp3" loop></audio>
     <div class="wrapper">
       <!-- Level selection -->
       <div id="levelScreen" class="level-screen">

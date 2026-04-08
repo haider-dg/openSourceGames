@@ -12,8 +12,46 @@ let disableDeck = false;
 
 // Sounds
 const winSound = new Audio("level-complete.mp3");
+const soundToggle = document.getElementById("sound-toggle");
+const onIcon = document.getElementById("sound-on-icon");
+const offIcon = document.getElementById("sound-off-icon");
+const bgSound = document.getElementById("bg-sound");
+
+function playBackgroundSound() {
+    if (bgSound) {
+        bgSound.volume = 0.7; // 70% volume
+        bgSound.play().then(() => {
+            document.removeEventListener("click", playBackgroundSound);
+            document.removeEventListener("touchstart", playBackgroundSound);
+            window.removeEventListener("load", playBackgroundSound);
+        }).catch(function (error) {
+            console.log("Background audio playback failed or prevented:", error);
+        });
+    }
+}
+
+document.addEventListener("click", playBackgroundSound);
+document.addEventListener("touchstart", playBackgroundSound);
+window.addEventListener("load", playBackgroundSound);
+playBackgroundSound();
+
+if (soundToggle && bgSound) {
+    soundToggle.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (bgSound.muted) {
+            bgSound.muted = false;
+            onIcon.style.display = "block";
+            offIcon.style.display = "none";
+        } else {
+            bgSound.muted = true;
+            onIcon.style.display = "none";
+            offIcon.style.display = "block";
+        }
+    });
+}
 
 function playSound(audio) {
+    if (bgSound && bgSound.muted) return; // Respect global mute
     audio.currentTime = 0;
     audio.play().catch(e => console.log("Sound play prevented:", e));
 }

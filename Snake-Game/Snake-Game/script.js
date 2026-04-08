@@ -22,8 +22,44 @@ let consecutiveLosses = 0;
 // Sounds
 const eatSound = new Audio("click_sound.mp3");
 const hitSound = new Audio("hit-sound.mp3");
+const soundToggle = document.getElementById("sound-toggle");
+const soundIcon = document.getElementById("sound-icon");
+const bgSound = document.getElementById("bg-sound");
+
+function playBackgroundSound() {
+    if (bgSound) {
+        bgSound.play().then(() => {
+            document.removeEventListener("keydown", playBackgroundSound);
+            document.removeEventListener("click", playBackgroundSound);
+            document.removeEventListener("touchstart", playBackgroundSound);
+            window.removeEventListener("load", playBackgroundSound);
+        }).catch(function (error) {
+            console.log("Background audio playback failed or prevented:", error);
+        });
+    }
+}
+
+document.addEventListener("keydown", playBackgroundSound);
+document.addEventListener("click", playBackgroundSound);
+document.addEventListener("touchstart", playBackgroundSound);
+window.addEventListener("load", playBackgroundSound);
+playBackgroundSound();
+
+if (soundToggle && bgSound) {
+    soundToggle.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (bgSound.muted) {
+            bgSound.muted = false;
+            soundIcon.className = "fa-solid fa-volume-high";
+        } else {
+            bgSound.muted = true;
+            soundIcon.className = "fa-solid fa-volume-xmark";
+        }
+    });
+}
 
 function playSound(audio) {
+    if (bgSound && bgSound.muted) return; // Respect global mute
     audio.currentTime = 0;
     audio.play().catch(e => console.log("Sound play prevented:", e));
 }

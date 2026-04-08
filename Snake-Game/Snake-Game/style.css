@@ -40,6 +40,29 @@ body {
   padding: 20px 27px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+.high-score-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.sound-toggle {
+  background: transparent;
+  border: none;
+  color: #B8C6DC;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+.sound-toggle:hover {
+  color: #60CBFF;
+  transform: scale(1.1);
+}
+.sound-toggle:active {
+  transform: scale(0.9);
 }
 .play-board {
   height: 100%;

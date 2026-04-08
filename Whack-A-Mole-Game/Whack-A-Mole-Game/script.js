@@ -107,3 +107,40 @@ function bonk(e) {
 }
 
 moles.forEach((mole) => mole.addEventListener("click", bonk));
+
+// Background Sound Logic
+(function () {
+  const bgSound = document.getElementById("bg-sound");
+  const soundToggle = document.getElementById("sound-toggle");
+  const onIcon = document.getElementById("sound-on-icon");
+  const offIcon = document.getElementById("sound-off-icon");
+
+  function playBackgroundSound() {
+    if (bgSound) {
+      bgSound.play().then(() => {
+        document.removeEventListener("click", playBackgroundSound);
+        document.removeEventListener("touchstart", playBackgroundSound);
+      }).catch(function (error) {
+        console.log("Background audio playback failed or prevented:", error);
+      });
+    }
+  }
+
+  document.addEventListener("click", playBackgroundSound);
+  document.addEventListener("touchstart", playBackgroundSound);
+
+  if (soundToggle && bgSound) {
+    soundToggle.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (bgSound.muted) {
+        bgSound.muted = false;
+        onIcon.style.display = "block";
+        offIcon.style.display = "none";
+      } else {
+        bgSound.muted = true;
+        onIcon.style.display = "none";
+        offIcon.style.display = "block";
+      }
+    });
+  }
+})();

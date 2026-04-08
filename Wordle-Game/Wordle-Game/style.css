@@ -601,3 +601,48 @@ body {
     min-width: 42px;
   }
 }
+
+.sound-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.sound-toggle i {
+  font-size: 20px;
+}
+
+.sound-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.1);
+}
+
+.sound-toggle:active {
+  transform: scale(0.9);
+}
+
+@media (max-width: 768px) {
+  .sound-toggle {
+    top: 15px;
+    right: 15px;
+    width: 38px;
+    height: 38px;
+  }
+  .sound-toggle i {
+    font-size: 16px;
+  }
+}

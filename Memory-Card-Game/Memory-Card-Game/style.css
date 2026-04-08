@@ -173,3 +173,51 @@ body {
     max-width: 35px;
   }
 }
+
+/* Sound Toggle Button */
+.sound-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sound-toggle:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.sound-toggle:active {
+  transform: scale(0.9);
+}
+
+.sound-toggle svg {
+  width: 24px;
+  height: 24px;
+}
+
+@media (max-width: 600px) {
+  .sound-toggle {
+    top: 15px;
+    right: 15px;
+    width: 38px;
+    height: 38px;
+  }
+  .sound-toggle svg {
+    width: 20px;
+    height: 20px;
+  }
+}
