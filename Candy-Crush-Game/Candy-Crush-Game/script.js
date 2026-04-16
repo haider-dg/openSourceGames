@@ -278,7 +278,7 @@ function candyCrushGame() {
             gameId: localVars.vGameID
         };
         window.parent.postMessage(message, '*');
-        console.log(`Sent: ${JSON.stringify(message)}`);
+        // console.log(`Sent: ${JSON.stringify(message)}`);
     }
 
     // Start the Game
@@ -309,7 +309,7 @@ function candyCrushGame() {
             if (endlessAdInterval) clearInterval(endlessAdInterval);
             endlessAdInterval = setInterval(() => {
                 if (currentMode === "endless") {
-                    console.log("Endless Mode: 5-minute ad trigger");
+                    // console.log("Endless Mode: 5-minute ad trigger");
                     broadcastAdMessage("endless_periodic");
                 }
             }, 300000); 
@@ -342,7 +342,7 @@ function candyCrushGame() {
 
     window.addEventListener("message", (event) => {
         if (event.data.type === "adSuccessfullyWatched") {
-            console.log('Recieved: ', "Ad Watched");
+            // console.log('Recieved: ', "Ad Watched");
             restartOverlay.style.display = "none";
             resetGame();
         }

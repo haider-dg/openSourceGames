@@ -85,27 +85,27 @@ function broadcastAdMessage(state = localVars.vState) {
         gameId: localVars.vGameID
     };
     window.parent.postMessage(message, "*");
-    console.log(`Sent: ${JSON.stringify(message)}`);
+    // console.log(`Sent: ${JSON.stringify(message)}`);
 }
 
 function triggerAd(state, callback, bypassCooldown = false) {
     const now = Date.now();
     const isCooldownActive = (now - lastAdTime < AD_COOLDOWN);
     
-    console.log(`Ad Trigger: state=${state}, cooldownActive=${isCooldownActive}, bypass=${bypassCooldown}`);
+    // console.log(`Ad Trigger: state=${state}, cooldownActive=${isCooldownActive}, bypass=${bypassCooldown}`);
     
     if (bypassCooldown || !isCooldownActive) {
         pendingAdCallback = callback;
         broadcastAdMessage(state);
     } else {
-        console.log("Ad Trigger: Skipping due to cooldown");
+        // console.log("Ad Trigger: Skipping due to cooldown");
         if (callback) callback();
     }
 }
 
 window.addEventListener("message", (event) => {
     if (event.data.type === "adSuccessfullyWatched") {
-        console.log("Received: Ad Watched");
+        // console.log("Received: Ad Watched");
         lastAdTime = Date.now();
         if (pendingAdCallback) {
             const cb = pendingAdCallback;
@@ -167,7 +167,7 @@ const resetGame = () => {
 }
 
 const reviveSnake = () => {
-    console.log("Revive: Executing Revival");
+    // console.log("Revive: Executing Revival");
     gameOver = false;
     // Safe area (center)
     snakeX = 15;
@@ -190,7 +190,7 @@ const reviveSnake = () => {
 }
 
 reviveBtn.addEventListener("click", () => {
-    console.log("Revive: Button Clicked");
+    // console.log("Revive: Button Clicked");
     clearInterval(countdownInterval); // Stop the timer once clicked
     triggerAd("revive", reviveSnake, true); // Bypass cooldown for revive
 });

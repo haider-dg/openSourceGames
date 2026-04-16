@@ -58,7 +58,7 @@ function triggerAd(state, callback, bypassCooldown = false) {
 
 window.addEventListener("message", (event) => {
     if (event.data.type === "adSuccessfullyWatched") {
-        console.log("Received: Ad Watched");
+        // console.log("Received: Ad Watched");
         lastAdTime = Date.now();
         if (pendingAdCallback) {
             const cb = pendingAdCallback;

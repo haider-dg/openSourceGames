@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Puzzle Game</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="icon" href="https://i.ibb.co/M6KTWnf/pic.jpg" />
+</head>
+
+<body>
+    <div class="wrapper">
+        <div id="levelScreen" class="level-screen">
+            <div class="level-header">
+                <h1>Puzzle Game</h1>
+                <button type="button" class="info-btn" title="how-to-play" aria-label="how-to-play">?</button>
+            </div>
+            <p>Choose difficulty</p>
+            <div class="level-buttons">
+                <button type="button" data-level="easy" class="level-btn">
+                    <span class="level-name">Easy</span>
+                    <span class="level-desc">3×3 Grid · 8 Tiles</span>
+                </button>
+                <button type="button" data-level="medium" class="level-btn">
+                    <span class="level-name">Medium</span>
+                    <span class="level-desc">4×4 Grid · 15 Tiles</span>
+                </button>
+                <button type="button" data-level="hard" class="level-btn">
+                    <span class="level-name">Hard</span>
+                    <span class="level-desc">5x5 Grid . 24 Tiles</span>
+                </button>
+            </div>
+        </div>
+        <audio id="bg-sound" src="Sliding-Puzzle-bg-sound.mp3" loop></audio>
+        <div id="gameScreen" class="hidden">
+            <div id="mainHeader" class="main-header">
+                <div class="logo-group">
+                    <img src="logo-alt.png" alt="logo" class="logo">
+                </div>
+                <div class="title-group">
+                    <h2>Puzzle Game</h2>
+                    <!-- <button type="button" class="info-btn">?</button> -->
+                </div>
+                <div class="action-group">
+                    <button type="button" class="info-btn">?</button>
+                    <div id="difficultyBadge" class="difficulty-badge">easy</div>
+                    <span>Moves:0</span>
+                    <div class="level-badge" id="levelBadge">Level 1</div>
+                    <button class="btn-sound" id="btnSound">
+                        <svg id="sound-on-icon" viewBox="0 0 28 28" width="28" height="28">
+                            <path fill="currentColor"
+                                d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.03,19.86 21,16.28 21,12C21,7.72 18.03,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z" />
+                        </svg>
+                        <svg id="sound-off-icon" viewBox="0 0 28 28" width="28" height="28" style="display:none;">
+                            <path fill="currentColor"
+                                d="M12,4L9.91,6.09L12,8.18V4M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L12,10.73L4.27,3M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18.03,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z" />
+                        </svg>
+                    </button>
+                    <button type="button" class="new-game">New Game</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+
+</html>

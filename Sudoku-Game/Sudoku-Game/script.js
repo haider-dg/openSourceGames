@@ -43,7 +43,7 @@
       gameId: localVars.vGameID
     };
     window.parent.postMessage(message, "*");
-    console.log(`Sent: ${JSON.stringify(message)}`);
+    // console.log(`Sent: ${JSON.stringify(message)}`);
   }
 
   function triggerAd(state, callback) {
@@ -58,7 +58,7 @@
 
   window.addEventListener("message", (event) => {
     if (event.data.type === "adSuccessfullyWatched") {
-      console.log("Received: Ad Watched");
+      // console.log("Received: Ad Watched");
       lastAdTime = Date.now();
       if (pendingAdCallback) {
         const cb = pendingAdCallback;

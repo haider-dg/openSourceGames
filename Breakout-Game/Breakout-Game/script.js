@@ -69,12 +69,12 @@ function broadcastMessage(type, state) {
     gameId: "breakout"
   };
   window.parent.postMessage(message, '*');
-  console.log(`Sent: ${JSON.stringify(message)}`);
+  // console.log(`Sent: ${JSON.stringify(message)}`);
 }
 
 window.addEventListener("message", (event) => {
   if (event.data && event.data.type === "adSuccessfullyWatched") {
-    console.log("Ad successfully watched message received");
+    // console.log("Ad successfully watched message received");
     if (adSuccessCallback) {
       adSuccessCallback();
       adSuccessCallback = null;

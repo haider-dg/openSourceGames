@@ -1,0 +1,452 @@
+:root {
+    --primary-color: #3b82f6;
+    --primary-glow: rgba(59, 130, 246, 0.5);
+    --bg-glass: rgba(15, 23, 42, 0.7);
+    --bg-glass-heavy: rgba(15, 23, 42, 0.9);
+    --text-main: #f8fafc;
+    --text-dim: #94a3b8;
+    --transition-fast: 0.2s ease;
+    --transition-mid: 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0f172a;
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.player-container {
+    position: relative;
+    width: 100vw;
+    max-width: 1000px;
+    background: #000;
+    /* border-radius: 20px; */
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    aspect-ratio: 16 / 9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+video::cue {
+    font-size: 1rem;
+    color: yellow;
+}
+
+::cue(u) {
+    color: red;
+}
+
+/* Click Overlay zones */
+.click-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 60px);
+    /* Leave room for controls if needed, but here we want it over video */
+    display: flex;
+    z-index: 10;
+}
+
+.seek-zone {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#middle-section {
+    /* background: #3b82f6; */
+    justify-content: space-between;
+}
+
+.skip-btn {
+    display: flex;
+    border: none;
+    background: none;
+    color: white;
+    align-items: center;
+    cursor: pointer;
+    width: 50px;
+    justify-content: center;
+    height: 50px;
+    border-radius: 50%;
+    z-index: 25;
+    background: rgba(0, 0, 0, 0.4);
+    transition: background var(--transition-fast);
+}
+
+.skip-btn:hover {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.seek-indicator {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all var(--transition-fast);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    padding: 20px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+}
+
+.seek-indicator i {
+    width: 40px;
+    height: 40px;
+}
+
+.seek-indicator span {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.seek-zone.active .seek-indicator {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Center Feedback */
+.center-feedback {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 15;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    padding: 15px;
+    border-radius: 50%;
+    transition: all var(--transition-mid);
+}
+
+.center-feedback.animate {
+    animation: centerIconFade 0.5s ease-out forwards;
+}
+
+@keyframes centerIconFade {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Controls Bar */
+.controls-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    /* padding: 20px;
+    padding-top: 30px; */
+    padding: 30px 10px 10px 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 20;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all var(--transition-mid);
+}
+
+.player-container:hover .controls-overlay,
+.player-container.paused .controls-overlay {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Progress Bar */
+.progress-container {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+    transition: height var(--transition-fast);
+}
+
+.progress-container:hover {
+    height: 8px;
+}
+
+.progress-bar {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.progress-current {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: var(--primary-color);
+    box-shadow: 0 0 10px var(--primary-glow);
+    width: 0%;
+    border-radius: 2px;
+}
+
+.progress-knob {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translate(50%, -50%) scale(0);
+    width: 15px;
+    height: 15px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform var(--transition-fast);
+}
+
+.progress-container:hover .progress-knob {
+    transform: translate(50%, -50%) scale(1);
+}
+
+/* Controls Buttons */
+.controls-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.controls-left,
+.controls-right {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.control-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: background var(--transition-fast);
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.control-btn i {
+    width: 20px;
+    height: 20px;
+}
+
+.time-display {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-dim);
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+#current-time {
+    color: var(--text-main);
+}
+
+/* Volume Slider */
+.volume-slider {
+    width: 0;
+    opacity: 0;
+    transition: all var(--transition-mid);
+    accent-color: var(--primary-color);
+}
+
+.controls-right:hover .volume-slider {
+    width: 80px;
+    opacity: 1;
+}
+
+
+/* Ripple Effect */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0);
+    animation: ripple-animation 0.6s ease-out;
+    pointer-events: none;
+    z-index: 5;
+    /* Behind indicators but above video */
+}
+
+@keyframes ripple-animation {
+    from {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Custom UI Polish */
+::-webkit-scrollbar {
+    width: 0;
+}
+
+/* Responsive Adjustments */
+
+/* Large Phones & Phablets */
+@media (min-width: 480px) {
+    .control-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .control-btn i {
+        width: 22px;
+        height: 22px;
+    }
+
+    .time-display {
+        font-size: 13px;
+        gap: 6px;
+    }
+
+    .controls-left,
+    .controls-right {
+        gap: 7px;
+    }
+
+    .center-feedback {
+        padding: 20px;
+    }
+}
+
+/* Tablets */
+@media (min-width: 768px) {
+    .control-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .control-btn i {
+        width: 24px;
+        height: 24px;
+    }
+
+    .time-display {
+        font-size: 14px;
+        gap: 8px;
+    }
+
+    .controls-left,
+    .controls-right {
+        gap: 12px;
+    }
+
+    .center-feedback {
+        padding: 25px;
+    }
+}
+
+/* Laptops & Desktops */
+@media (min-width: 1024px) {
+    .controls-overlay {
+        padding: 40px 20px 20px 15px;
+    }
+
+    .time-display {
+        gap: 10px;
+    }
+
+    .controls-left,
+    .controls-right {
+        gap: 15px;
+    }
+
+    .center-feedback {
+        padding: 30px;
+    }
+}
+
+/* 4K & Ultra-wide displays */
+@media (min-width: 1440px) {
+    .control-btn {
+        width: 44px;
+        height: 44px;
+    }
+
+    .time-display {
+        font-size: 15px;
+    }
+
+    .controls-left,
+    .controls-right {
+        gap: 20px;
+    }
+}
+
+/* 
+--current--
+480
+768
+1024
+1440 
+*/
+
+/* 
+--All--
+320px
+375px
+412px
+540px
+600px
+768px
+820px
+900px
+1024px
+1200px
+1280px
+1440px
