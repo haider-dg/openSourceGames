@@ -20,8 +20,6 @@
             <track src="basic-subtitles.vtt" id="captionTrack" kind="subtitles" srclang="en" label="English" default>
             Your browser does not support the video tag.
         </video>
-        <!-- skip-forward
-skip-back -->
         <!-- Clickable Overlay Zones -->
         <div class="click-overlay">
             <div class="seek-zone left" id="left-seek">
@@ -33,17 +31,17 @@ skip-back -->
             <div class="seek-zone middle" id="middle-section">
                 <!-- <div id='middle-controls'> -->
 
-                    <button class="skip-btn" id="skip-back">
-                        <i data-lucide="skip-back"></i>
-                    </button>
+                <button class="skip-btn" id="skip-back">
+                    <i data-lucide="skip-back"></i>
+                </button>
 
-                    <button class="skip-btn" id="center-feedback">
-                        <i data-lucide="play" id="center-icon"></i>
-                    </button>
+                <button class="skip-btn" id="center-feedback">
+                    <i data-lucide="play" id="center-icon"></i>
+                </button>
 
-                    <button class="skip-btn" id="skip-forward">
-                        <i data-lucide="skip-forward"></i>
-                    </button>
+                <button class="skip-btn" id="skip-forward">
+                    <i data-lucide="skip-forward"></i>
+                </button>
                 <!-- </div> -->
             </div>
             <div class="seek-zone right" id="right-seek">
@@ -53,11 +51,6 @@ skip-back -->
                 </div>
             </div>
         </div>
-
-        <!-- Central Play/Pause Toggle Feedback -->
-        <!-- <div class="center-feedback" id="center-feedback">
-            <i data-lucide="play" id="center-icon"></i>
-        </div> -->
 
         <!-- Controls Bar -->
         <div class="controls-overlay">
@@ -79,13 +72,16 @@ skip-back -->
                         <span class="time-separator">/</span>
                         <span id="duration">0:00</span>
                     </div>
+                    <div class="volume-control-group">
+                        <button class="control-btn" id="mute-btn" aria-label="Mute">
+                            <i data-lucide="volume-2"></i>
+                        </button>
+                        <input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.1"
+                            value="1">
+                    </div>
                 </div>
 
                 <div class="controls-right">
-                    <button class="control-btn" id="mute-btn" aria-label="Mute">
-                        <i data-lucide="volume-2"></i>
-                    </button>
-                    <input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.1" value="1">
                     <button class="control-btn" id="cc-btn" disabled="true" aria-label="Sub Titles" title="captions">
                         <i data-lucide="closed-caption"></i>
                     </button>
@@ -99,7 +95,25 @@ skip-back -->
             </div>
         </div>
     </div>
-
+    <div id="settings-overlay" class="settings-overlay">
+        <div class="settings-modal" id="settings-modal">
+            <div class="settings-header">
+                <h2>Settings</h2>
+                <button class="settings-close">
+                    <i data-lucide="circle-x"></i>
+                </button>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Playback Settings</h3>
+                </div>
+                <div class="col-md-6">
+                    <h3>Appearance</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
     <script src="script.js"></script>
     <script>
         // Initialize Lucide icons
